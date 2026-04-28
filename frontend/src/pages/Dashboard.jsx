@@ -2,7 +2,7 @@ import React from 'react'
 import { MessageSquare, Zap, TrendingUp, ChevronRight, MoreVertical } from 'lucide-react'
 import { Users } from '../lib/data'
 
-const Dashboard = () => {
+const Dashboard = ({ onNewChat, onSelectChat }) => {
     const features = [
         { title: 'Smart Conversations', desc: 'Chat with our AI assistant on anything.', icon: <MessageSquare className='text-violet-500' />, bg: 'bg-violet-500/10' },
         { title: 'Quick Answers', desc: 'Get instant answers to your questions.', icon: <Zap className='text-green-500' />, bg: 'bg-green-500/10' },
@@ -18,7 +18,11 @@ const Dashboard = () => {
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
                 {features.map((f, i) => (
-                    <div key={i} className='bg-[#171717] border border-[#262626] p-6 rounded-3xl hover:border-green-500/30 transition-all cursor-pointer group'>
+                    <div 
+                        key={i} 
+                        onClick={() => onNewChat(f.title)}
+                        className='bg-[#171717] border border-[#262626] p-6 rounded-3xl hover:border-green-500/30 transition-all cursor-pointer group active:scale-[0.98]'
+                    >
                         <div className={`w-12 h-12 ${f.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                             {f.icon}
                         </div>
@@ -37,13 +41,17 @@ const Dashboard = () => {
                 </div>
                 <div className='space-y-3'>
                     {Users.slice(0, 4).map((user) => (
-                        <div key={user.id} className='bg-[#171717] border border-[#262626] p-4 rounded-2xl flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer'>
+                        <div 
+                            key={user.id} 
+                            onClick={() => onSelectChat(user)}
+                            className='bg-[#171717] border border-[#262626] p-4 rounded-2xl flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer active:scale-[0.99]'
+                        >
                             <div className='w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center border border-green-500/20'>
-                                <MessageSquare className='size-5 text-green-500' />
+                                <img src={user.avatar} className='size-8 rounded-lg' alt="Avatar" />
                             </div>
                             <div className='flex-1'>
                                 <h4 className='text-sm font-bold group-hover:text-green-500 transition-colors'>{user.lastMessage}</h4>
-                                <p className='text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-medium'>{user.timestamp}</p>
+                                <p className='text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-medium'>{user.timestamp} • {user.name}</p>
                             </div>
                             <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors'>
                                 <MoreVertical className='size-4 text-gray-500' />

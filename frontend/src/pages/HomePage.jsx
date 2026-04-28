@@ -31,7 +31,10 @@ const HomePage = ({ onLogout }) => {
             case '/settings':
                 return <Settings onLogout={onLogout} />
             default:
-                return <Dashboard onNewChat={() => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1' })} />
+                return <Dashboard 
+                    onNewChat={(title) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'bot', text: `How can I help you with ${title}?`, timestamp: 'Just now' }] })} 
+                    onSelectChat={setSelectedUser}
+                />
         }
     }
 

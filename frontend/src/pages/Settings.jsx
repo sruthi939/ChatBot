@@ -51,7 +51,10 @@ const Settings = ({ onLogout }) => {
                             {section.items.map((item, j) => (
                                 <div 
                                     key={j} 
-                                    onClick={() => item.type === 'toggle' && togglePreference(item.key)}
+                                    onClick={() => {
+                                        if (item.type === 'toggle') togglePreference(item.key);
+                                        if (item.action) item.action();
+                                    }}
                                     className={`flex items-center justify-between p-6 cursor-pointer hover:bg-[#1a1a1a] transition-all ${j !== section.items.length - 1 ? 'border-b border-[#262626]' : ''}`}
                                 >
                                     <span className={`text-sm font-medium ${item.type === 'danger' ? 'text-red-500' : 'text-gray-200'}`}>
