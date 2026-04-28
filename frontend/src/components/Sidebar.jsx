@@ -1,8 +1,5 @@
 import React from 'react'
-import { 
-    Home, PlusSquare, Clock, Bookmark, Settings, 
-    Crown, MoreVertical, MessageSquare 
-} from 'lucide-react'
+import { Home, SquarePlus, Clock, Bookmark, Settings, Crown, MoreVertical, MessageSquare } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, NavigationItems } from '../lib/data';
 
@@ -32,15 +29,15 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             <div className='px-4 mb-8'>
                 <div className='flex flex-col gap-1'>
                     {NavigationItems.map((item) => {
-                        const Icon = { Home, PlusSquare, Clock, Bookmark, Settings }[item.icon];
+                        const Icon = { Home, SquarePlus, Clock, Bookmark, Settings }[item.icon];
                         const isActive = location.pathname === `/${item.id}` || (item.id === 'home' && location.pathname === '/');
                         return (
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.id === 'home' ? '/' : `/${item.id}`)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                    ${isActive 
-                                        ? "bg-green-500/10 text-green-500" 
+                                    ${isActive
+                                        ? "bg-green-500/10 text-green-500"
                                         : "text-gray-500 hover:bg-[#1a1a1a] hover:text-white"}`}
                             >
                                 <Icon className={`size-5 ${isActive ? "text-green-500" : "text-gray-500 group-hover:text-white"}`} />
@@ -62,15 +59,15 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                             key={user.id}
                             onClick={() => setSelectedUser(user)}
                             className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 group
-                                ${user.id === selectedUser?.id 
-                                    ? "bg-[#1a1a1a] border border-[#262626]" 
+                                ${user.id === selectedUser?.id
+                                    ? "bg-[#1a1a1a] border border-[#262626]"
                                     : "hover:bg-[#1a1a1a] border border-transparent"}`}
                         >
                             <div className='relative flex-shrink-0'>
-                                <img 
-                                    src={user.avatar} 
-                                    alt={user.name} 
-                                    className='size-10 rounded-lg bg-[#1a1a1a]' 
+                                <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className='size-10 rounded-lg bg-[#1a1a1a]'
                                 />
                                 {user.status === 'online' && (
                                     <span className='absolute -bottom-0.5 -right-0.5 size-2.5 bg-green-500 border-2 border-[#0b0b0b] rounded-full' />
@@ -128,4 +125,4 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
 
 export default Sidebar
 
-
+

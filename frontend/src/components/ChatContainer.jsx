@@ -1,8 +1,39 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { MoreVertical, Paperclip, Send, User, ChevronLeft } from 'lucide-react'
-import { Messages } from '../lib/data'
 
 const ChatContainer = ({ selectedUser, onBack }) => {
+    const [messages, setMessages] = useState(selectedUser?.messages || []);
+    const [inputText, setInputText] = useState('');
+
+    useEffect(() => {
+        setMessages(selectedUser?.messages || []);
+    }, [selectedUser]);
+
+    const handleSendMessage = () => {
+        if (!inputText.trim()) return;
+
+        const newMessage = {
+            id: messages.length + 1,
+            sender: 'user',
+            text: inputText,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setMessages([...messages, newMessage]);
+        setInputText('');
+
+        // Simulate bot response
+        setTimeout(() => {
+            const botResponse = {
+                id: messages.length + 2,
+                sender: 'bot',
+                text: "I'm processing your request. How else can I help you?",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, botResponse]);
+        }, 1000);
+    };
+
     return (
         <div className='flex-1 flex flex-col bg-[#0b0b0b] relative h-full'>
             {/* Chat Header */}
@@ -12,7 +43,11 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                         <ChevronLeft className='size-6 text-gray-500' />
                     </button>
                     <div className='w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center border border-green-500/20'>
-                        <User className='text-green-500 size-6' />
+                        {selectedUser?.avatar ? (
+                            <img src={selectedUser.avatar} className='size-10 rounded-xl' alt="Avatar" />
+                        ) : (
+                            <User className='text-green-500 size-6' />
+                        )}
                     </div>
                     <div>
                         <h2 className='text-lg font-bold'>{selectedUser?.name || 'ChatBot AI'}</h2>
@@ -28,8 +63,8 @@ const ChatContainer = ({ selectedUser, onBack }) => {
             </div>
 
             {/* Messages Area */}
-            <div className='flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6'>
-                {Messages.map((msg) => (
+            <div className='flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 flex flex-col'>
+                {messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] group flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                             <div className={`
@@ -42,16 +77,6 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                             </div>
                             <div className='flex items-center gap-2 mt-2 px-1'>
                                 <span className='text-[10px] text-gray-600 font-medium uppercase'>{msg.timestamp}</span>
-                                {msg.sender === 'user' && (
-                                    <div className='flex items-center'>
-                                        <div className='size-3 text-green-500'>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        </div>
-                                        <div className='size-3 text-green-500 -ml-1.5'>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -66,10 +91,16 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                     </button>
                     <input 
                         type="text" 
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                         placeholder="Type a message..."
                         className='flex-1 bg-transparent border-none outline-none text-sm py-2 text-white placeholder-gray-600'
                     />
-                    <button className='p-3 bg-green-500 hover:bg-green-600 text-black rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95'>
+                    <button 
+                        onClick={handleSendMessage}
+                        className='p-3 bg-green-500 hover:bg-green-600 text-black rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95'
+                    >
                         <Send className='size-5' />
                     </button>
                 </div>
@@ -78,4 +109,5 @@ const ChatContainer = ({ selectedUser, onBack }) => {
     )
 }
 
-export default ChatContainer
+export default ChatContainer
+

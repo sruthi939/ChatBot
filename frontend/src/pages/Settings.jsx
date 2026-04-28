@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ChevronRight, LogOut } from 'lucide-react'
 
 const Settings = () => {
+    const [preferences, setPreferences] = useState({
+        saveHistory: true,
+        suggestions: true,
+        notifications: false
+    });
+
+    const togglePreference = (key) => {
+        setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
+    };
+
     const sections = [
         {
             title: 'General',
@@ -13,9 +23,9 @@ const Settings = () => {
         {
             title: 'Preferences',
             items: [
-                { label: 'Save chat history', type: 'toggle', active: true },
-                { label: 'Auto suggestions', type: 'toggle', active: true },
-                { label: 'Sound notifications', type: 'toggle', active: false }
+                { label: 'Save chat history', type: 'toggle', active: preferences.saveHistory, key: 'saveHistory' },
+                { label: 'Auto suggestions', type: 'toggle', active: preferences.suggestions, key: 'suggestions' },
+                { label: 'Sound notifications', type: 'toggle', active: preferences.notifications, key: 'notifications' }
             ]
         },
         {
@@ -39,7 +49,11 @@ const Settings = () => {
                         <h3 className='text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6 px-2'>{section.title}</h3>
                         <div className='bg-[#171717] border border-[#262626] rounded-[32px] overflow-hidden'>
                             {section.items.map((item, j) => (
-                                <div key={j} className={`flex items-center justify-between p-6 ${j !== section.items.length - 1 ? 'border-b border-[#262626]' : ''}`}>
+                                <div 
+                                    key={j} 
+                                    onClick={() => item.type === 'toggle' && togglePreference(item.key)}
+                                    className={`flex items-center justify-between p-6 cursor-pointer hover:bg-[#1a1a1a] transition-all ${j !== section.items.length - 1 ? 'border-b border-[#262626]' : ''}`}
+                                >
                                     <span className={`text-sm font-medium ${item.type === 'danger' ? 'text-red-500' : 'text-gray-200'}`}>
                                         {item.label}
                                     </span>
@@ -66,3 +80,4 @@ const Settings = () => {
 }
 
 export default Settings
+
