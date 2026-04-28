@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { ChevronRight, LogOut } from 'lucide-react'
 
-const Settings = () => {
+const Settings = ({ onLogout }) => {
     const [preferences, setPreferences] = useState({
         saveHistory: true,
         suggestions: true,
@@ -32,7 +32,7 @@ const Settings = () => {
             title: 'Account',
             items: [
                 { label: 'Change Password', type: 'link' },
-                { label: 'Log Out', type: 'danger' }
+                { label: 'Log Out', type: 'danger', action: onLogout }
             ]
         }
     ]

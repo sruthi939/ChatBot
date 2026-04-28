@@ -94,7 +94,10 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             {/* Bottom Section */}
             <div className='p-4 space-y-4'>
                 {/* Upgrade Pro Card */}
-                <div className='bg-gradient-to-br from-[#1a1a1a] to-[#0b0b0b] border border-[#262626] rounded-2xl p-4 relative overflow-hidden group cursor-pointer'>
+                <div 
+                    onClick={() => alert('Pro features coming soon!')}
+                    className='bg-gradient-to-br from-[#1a1a1a] to-[#0b0b0b] border border-[#262626] rounded-2xl p-4 relative overflow-hidden group cursor-pointer active:scale-95 transition-all'
+                >
                     <div className='absolute -right-4 -top-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-xl group-hover:bg-yellow-500/20 transition-all' />
                     <div className='relative z-10 flex flex-col gap-3'>
                         <div className='flex items-center gap-2'>
@@ -108,7 +111,10 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                 </div>
 
                 {/* User Profile */}
-                <div className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50'>
+                <div 
+                    onClick={() => navigate('/profile')}
+                    className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50 cursor-pointer hover:bg-[#1a1a1a] transition-all active:scale-95'
+                >
                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="User" className='size-10 rounded-xl' />
                     <div className='flex-1 min-w-0'>
                         <h4 className='text-sm font-bold truncate'>John Doe</h4>

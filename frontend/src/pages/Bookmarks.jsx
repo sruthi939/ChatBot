@@ -1,13 +1,8 @@
 import React from 'react'
 import { Bookmark, ChevronRight } from 'lucide-react'
+import { BookmarksList } from '../lib/data'
 
 const Bookmarks = () => {
-    const items = [
-        { title: 'Tips to improve productivity', desc: '• Prioritize your tasks\n• Use a planner or to-do list...', date: 'May 20, 2024' },
-        { title: 'Avoiding multitasking', desc: 'Multitasking can reduce efficiency and increase mistakes. Focus on one...', date: 'May 20, 2024' },
-        { title: 'Python code example', desc: 'def hello():\n  print("Hello, World!")', date: 'May 19, 2024' }
-    ]
-
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
             <header className='mb-10'>
@@ -15,7 +10,7 @@ const Bookmarks = () => {
             </header>
 
             <div className='space-y-6'>
-                {items.map((item, i) => (
+                {BookmarksList.map((item, i) => (
                     <div key={i} className='bg-[#171717] border border-[#262626] p-6 rounded-[32px] relative group hover:border-green-500/30 transition-all cursor-pointer'>
                         <div className='absolute top-6 right-6 p-2 bg-green-500 rounded-lg shadow-lg shadow-green-500/20'>
                             <Bookmark className='size-4 text-black fill-black' />
@@ -34,3 +29,4 @@ const Bookmarks = () => {
 }
 
 export default Bookmarks
+
