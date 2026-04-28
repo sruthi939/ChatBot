@@ -1,18 +1,21 @@
 import React from 'react'
-import { MoreVertical, Paperclip, Send, User } from 'lucide-react'
+import { MoreVertical, Paperclip, Send, User, ChevronLeft } from 'lucide-react'
 import { Messages } from '../lib/data'
 
-const ChatContainer = ({ selectedUser }) => {
+const ChatContainer = ({ selectedUser, onBack }) => {
     return (
         <div className='flex-1 flex flex-col bg-[#0b0b0b] relative h-full'>
             {/* Chat Header */}
             <div className='p-6 border-b border-[#1a1a1a] flex justify-between items-center bg-[#0b0b0b]/80 backdrop-blur-xl sticky top-0 z-10'>
                 <div className='flex items-center gap-4'>
+                    <button onClick={onBack} className='md:hidden p-2 hover:bg-[#1a1a1a] rounded-xl transition-colors'>
+                        <ChevronLeft className='size-6 text-gray-500' />
+                    </button>
                     <div className='w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center border border-green-500/20'>
                         <User className='text-green-500 size-6' />
                     </div>
                     <div>
-                        <h2 className='text-lg font-bold'>ChatBot AI</h2>
+                        <h2 className='text-lg font-bold'>{selectedUser?.name || 'ChatBot AI'}</h2>
                         <div className='flex items-center gap-1.5'>
                             <div className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
                             <span className='text-[10px] text-green-500 font-medium tracking-wide uppercase'>Online</span>
