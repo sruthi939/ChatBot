@@ -48,7 +48,7 @@ const App = () => {
           } 
         />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/signup" element={<Register />} />
+        <Route path="/signup" element={<Register onLogin={handleLogin} />} />
         
         {/* Protected routes */}
         <Route path="/home" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />

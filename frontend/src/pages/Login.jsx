@@ -81,6 +81,13 @@ const Login = ({ onLogin }) => {
                     {isLoading ? 'Signing in...' : 'Login'}
                 </button>
 
+                <button 
+                    onClick={() => navigate('/signup')}
+                    className='w-full bg-transparent border border-[#262626] hover:bg-[#1a1a1a] text-white font-bold py-5 rounded-3xl mt-4 transition-all active:scale-95'
+                >
+                    Create New Account
+                </button>
+
                 <div className='w-full flex items-center gap-4 my-10'>
                     <div className='flex-1 h-[1px] bg-[#262626]' />
                     <span className='text-[10px] text-gray-600 uppercase font-bold tracking-widest'>or continue with</span>

@@ -3,7 +3,7 @@ import { Mail, Lock, User, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { register as registerApi } from '../lib/api'
 
-const Register = () => {
+const Register = ({ onLogin }) => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -21,7 +21,8 @@ const Register = () => {
             const { data } = await registerApi({ name, email, password });
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            window.location.href = '/'; // Reload to pick up auth state
+            onLogin(data.user);
+            navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
         } finally {
