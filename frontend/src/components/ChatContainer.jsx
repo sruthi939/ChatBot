@@ -1,37 +1,59 @@
 import React, { useState, useEffect } from 'react'
 import { MoreVertical, Paperclip, Send, User, ChevronLeft } from 'lucide-react'
+import { sendMessage as sendMessageApi, getChatHistory } from '../lib/api'
 
 const ChatContainer = ({ selectedUser, onBack }) => {
-    const [messages, setMessages] = useState(selectedUser?.messages || []);
+    const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
 
     useEffect(() => {
-        setMessages(selectedUser?.messages || []);
+        const fetchHistory = async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && selectedUser?.id === 1) { // Assuming id:1 is the main AI assistant for now
+                try {
+                    const { data } = await getChatHistory(user.id);
+                    if (data.length > 0) setMessages(data);
+                    else setMessages(selectedUser?.messages || []);
+                } catch (err) {
+                    setMessages(selectedUser?.messages || []);
+                }
+            } else {
+                setMessages(selectedUser?.messages || []);
+            }
+        };
+        fetchHistory();
     }, [selectedUser]);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!inputText.trim()) return;
 
-        const newMessage = {
-            id: messages.length + 1,
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userMsg = {
+            id: Date.now(),
             sender: 'user',
             text: inputText,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        setMessages([...messages, newMessage]);
+        setMessages(prev => [...prev, userMsg]);
         setInputText('');
+        setIsTyping(true);
 
-        // Simulate bot response
-        setTimeout(() => {
-            const botResponse = {
-                id: messages.length + 2,
+        try {
+            const { data } = await sendMessageApi({ userId: user.id, text: inputText });
+            setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+        } catch (err) {
+            const errorMsg = {
+                id: Date.now() + 1,
                 sender: 'bot',
-                text: "I'm processing your request. How else can I help you?",
+                text: "I'm sorry, I'm having trouble connecting to my brain right now. Please check your API key in the backend .env file.",
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
-            setMessages(prev => [...prev, botResponse]);
-        }, 1000);
+            setMessages(prev => [...prev, errorMsg]);
+        } finally {
+            setIsTyping(false);
+        }
     };
 
     return (
@@ -81,6 +103,16 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                         </div>
                     </div>
                 ))}
+
+                {isTyping && (
+                    <div className='flex justify-start'>
+                        <div className='bg-[#171717] border border-[#262626] p-4 rounded-2xl rounded-tl-none flex gap-1.5'>
+                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-0' />
+                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-150' />
+                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-300' />
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Input Area */}

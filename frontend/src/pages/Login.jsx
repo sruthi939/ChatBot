@@ -1,9 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Mail, Lock, Eye, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { login as loginApi } from '../lib/api'
 
 const Login = ({ onLogin }) => {
     const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLoginClick = async () => {
+        if (!email || !password) return setError('Please fill in all fields');
+        
+        setIsLoading(true);
+        setError('');
+        
+        try {
+            const { data } = await loginApi({ email, password });
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            onLogin(data.user);
+            navigate('/');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Login failed. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className='min-h-screen bg-[#0b0b0b] flex flex-col items-center p-10'>
@@ -17,21 +41,27 @@ const Login = ({ onLogin }) => {
                 <h1 className='text-3xl font-bold mb-2'>Welcome Back!</h1>
                 <p className='text-gray-500 text-sm mb-12'>Sign in to continue</p>
 
+                {error && <div className='w-full p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-xs text-center'>{error}</div>}
+
                 <div className='w-full space-y-5'>
                     <div className='relative group'>
                         <Mail className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
                         <input 
                             type="email" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm'
+                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
                         />
                     </div>
                     <div className='relative group'>
                         <Lock className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
                         <input 
                             type="password" 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-14 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm'
+                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-14 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
                         />
                         <button className='absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white'>
                             <Eye className='size-5' />
@@ -44,13 +74,11 @@ const Login = ({ onLogin }) => {
                 </button>
 
                 <button 
-                    onClick={() => {
-                        onLogin();
-                        navigate('/');
-                    }}
-                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl mt-10 transition-all shadow-lg shadow-green-500/20 active:scale-95'
+                    onClick={handleLoginClick}
+                    disabled={isLoading}
+                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl mt-10 transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50 disabled:scale-100'
                 >
-                    Login
+                    {isLoading ? 'Signing in...' : 'Login'}
                 </button>
 
                 <div className='w-full flex items-center gap-4 my-10'>
