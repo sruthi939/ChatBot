@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import LandingPage from './pages/LandingPage'
 
 const App = () => {
@@ -47,6 +48,7 @@ const App = () => {
           } 
         />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/signup" element={<Register />} />
         
         {/* Protected routes */}
         <Route path="/home" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />

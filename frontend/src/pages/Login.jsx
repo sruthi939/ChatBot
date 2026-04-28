@@ -103,7 +103,7 @@ const Login = ({ onLogin }) => {
                 </div>
 
                 <p className='mt-12 text-sm text-gray-500'>
-                    Don't have an account? <button className='text-green-500 font-bold hover:underline'>Sign Up</button>
+                    Don't have an account? <button onClick={() => navigate('/signup')} className='text-green-500 font-bold hover:underline'>Sign Up</button>
                 </p>
             </div>
         </div>
