@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mail, Lock, Eye, Chrome, Github, Apple } from 'lucide-react'
+import { Mail, Lock, Eye, Github, Apple, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const Login = ({ onLogin }) => {
@@ -61,7 +61,7 @@ const Login = ({ onLogin }) => {
 
                 <div className='flex gap-5'>
                     <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:border-gray-600 transition-all active:scale-95'>
-                        <Chrome className='size-6 text-white' />
+                        <svg className='size-6 text-white' viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.288 1.288-3.312 2.712-7.112 2.712-6.048 0-10.744-4.896-10.744-10.944s4.696-10.944 10.744-10.944c3.272 0 5.672 1.288 7.448 2.968l2.312-2.312c-2.008-1.92-4.632-3.112-8.32-3.112-7.856 0-14.328 6.472-14.328 14.32s6.472 14.32 14.328 14.32c4.136 0 7.448-1.352 9.968-3.976 2.568-2.568 3.424-6.144 3.424-8.784 0-.848-.064-1.664-.192-2.448h-11.8z"/></svg>
                     </button>
                     <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:border-gray-600 transition-all active:scale-95'>
                         <Apple className='size-6 text-white' />
@@ -79,4 +79,5 @@ const Login = ({ onLogin }) => {
     )
 }
 
-export default Login
+export default Login
+

@@ -45,6 +45,7 @@ const App = () => {
         
         {/* Protected routes */}
         <Route path="/home" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/new-chat" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/history" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/bookmarks" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/settings" element={isLoggedIn ? <HomePage /> : <Navigate to="/login" />} />
