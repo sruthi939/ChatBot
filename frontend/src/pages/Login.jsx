@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Mail, Lock, Eye, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { login as loginApi } from '../lib/api'
+import { assets } from '../assets/assets'
 
 const Login = ({ onLogin }) => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Login = ({ onLogin }) => {
             onLogin(data.user);
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Please try again.');
+            setError(err.response?.data?.error || err.response?.data?.message || 'Login failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -32,10 +33,8 @@ const Login = ({ onLogin }) => {
     return (
         <div className='min-h-screen bg-[#0b0b0b] flex flex-col items-center p-10'>
             <div className='w-full max-w-sm flex flex-col items-center mt-12'>
-                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20'>
-                    <div className='w-12 h-12 bg-black rounded-2xl flex items-center justify-center'>
-                         <span className='text-green-500 font-bold text-xl'>AI</span>
-                    </div>
+                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20 overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
                 </div>
 
                 <h1 className='text-3xl font-bold mb-2'>Welcome Back!</h1>

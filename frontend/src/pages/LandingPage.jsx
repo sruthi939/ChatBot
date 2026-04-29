@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { assets } from '../assets/assets'
 
 const SplashScreen = ({ onFinish }) => {
     useEffect(() => {
@@ -11,10 +12,8 @@ const SplashScreen = ({ onFinish }) => {
     return (
         <div className='fixed inset-0 bg-[#0b0b0b] flex flex-col items-center justify-center z-50 animate-in fade-in duration-500'>
             <div className='relative'>
-                <div className='w-24 h-24 bg-green-500 rounded-[32px] flex items-center justify-center shadow-2xl shadow-green-500/20 animate-pulse'>
-                    <div className='w-14 h-14 bg-black rounded-2xl flex items-center justify-center'>
-                        <span className='text-green-500 font-bold text-2xl'>AI</span>
-                    </div>
+                <div className='w-24 h-24 bg-green-500 rounded-[32px] flex items-center justify-center shadow-2xl shadow-green-500/20 animate-pulse overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
                 </div>
                 <div className='absolute -inset-4 bg-green-500/10 rounded-[48px] blur-2xl animate-pulse' />
             </div>

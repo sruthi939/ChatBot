@@ -1,8 +1,11 @@
 import React from 'react'
 import { MessageSquare, Zap, TrendingUp, ChevronRight, MoreVertical } from 'lucide-react'
 import { Users } from '../lib/data'
+import { assets } from '../assets/assets'
 
 const Dashboard = ({ onNewChat, onSelectChat }) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{"name":"User"}');
+    
     const features = [
         { title: 'Smart Conversations', desc: 'Chat with our AI assistant on anything.', icon: <MessageSquare className='text-violet-500' />, bg: 'bg-violet-500/10' },
         { title: 'Quick Answers', desc: 'Get instant answers to your questions.', icon: <Zap className='text-green-500' />, bg: 'bg-green-500/10' },
@@ -11,9 +14,14 @@ const Dashboard = ({ onNewChat, onSelectChat }) => {
 
     return (
         <div className='flex-1 bg-[#0b0b0b] overflow-y-auto custom-scrollbar p-10'>
-            <header className='mb-12'>
-                <h1 className='text-3xl font-bold mb-2'>Welcome back, John! 👋</h1>
-                <p className='text-gray-500'>What would you like to explore today?</p>
+            <header className='mb-12 flex items-center gap-6'>
+                <div className='w-16 h-16 bg-green-500 rounded-3xl overflow-hidden shadow-lg shadow-green-500/10'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+                </div>
+                <div>
+                    <h1 className='text-3xl font-bold mb-1'>Welcome back, {user.name.split(' ')[0]}! 👋</h1>
+                    <p className='text-gray-500'>What would you like to explore today?</p>
+                </div>
             </header>
 
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>

@@ -1,11 +1,15 @@
 import React from 'react'
 import { Bookmark, ChevronRight } from 'lucide-react'
 import { BookmarksList } from '../lib/data'
+import { assets } from '../assets/assets'
 
 const Bookmarks = () => {
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
-            <header className='mb-10'>
+            <header className='flex items-center gap-4 mb-10'>
+                <div className='w-10 h-10 bg-green-500 rounded-xl overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+                </div>
                 <h1 className='text-2xl font-bold'>Bookmarks</h1>
             </header>
 

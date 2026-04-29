@@ -15,14 +15,32 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/chat', require('./routes/chat'));
 
+// Health check
 app.get('/', (req, res) => {
-    res.send('ChatBot API is running...');
+    res.json({ status: 'active', message: 'ChatBot API is running...' });
+});
+
+// Centralized Error Handler
+app.use((err, req, res, next) => {
+    console.error('SERVER_ERROR:', err.stack);
+    res.status(500).json({ error: 'Internal Server Error', details: err.message });
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log('MongoDB Connection Error:', err));
+if (!process.env.MONGO_URI) {
+    console.error('❌ Error: MONGO_URI is not defined in .env');
+} else {
+    // Aggressively remove all spaces that might have crept into the URI
+    const mongoUri = process.env.MONGO_URI.replace(/\s/g, '');
+    const redactedUri = mongoUri.replace(/\/\/(.*):(.*)@/, '//$1:****@');
+    console.log('📡 Attempting to connect to:', redactedUri);
+
+    mongoose.connect(mongoUri)
+        .then(() => console.log('✅ MongoDB Connected'))
+        .catch(err => {
+            console.error('❌ MongoDB Connection Error:', err.message);
+        });
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

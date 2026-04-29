@@ -2,6 +2,7 @@ import React from 'react'
 import { Search, MessageSquare, MoreVertical } from 'lucide-react'
 import { Users } from '../lib/data'
 import { useNavigate } from 'react-router-dom'
+import { assets } from '../assets/assets'
 
 const History = () => {
     const navigate = useNavigate();
@@ -10,7 +11,12 @@ const History = () => {
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
             <header className='flex justify-between items-center mb-10'>
-                <h1 className='text-2xl font-bold'>History</h1>
+                <div className='flex items-center gap-4'>
+                    <div className='w-10 h-10 bg-green-500 rounded-xl overflow-hidden'>
+                        <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+                    </div>
+                    <h1 className='text-2xl font-bold'>History</h1>
+                </div>
                 <button className='p-3 bg-[#171717] rounded-2xl border border-[#262626]'>
                     <Search className='size-5 text-gray-500' />
                 </button>
