@@ -114,10 +114,18 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                     onClick={() => navigate('/profile')}
                     className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50 cursor-pointer hover:bg-[#1a1a1a] transition-all active:scale-95'
                 >
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="User" className='size-10 rounded-xl' />
+                    <img 
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${JSON.parse(localStorage.getItem('user') || '{}').name || 'User'}`} 
+                        alt="User" 
+                        className='size-10 rounded-xl bg-[#1a1a1a]' 
+                    />
                     <div className='flex-1 min-w-0'>
-                        <h4 className='text-sm font-bold truncate'>John Doe</h4>
-                        <p className='text-[10px] text-gray-500 truncate'>johndoe@gmail.com</p>
+                        <h4 className='text-sm font-bold truncate'>
+                            {JSON.parse(localStorage.getItem('user') || '{}').name || 'User Account'}
+                        </h4>
+                        <p className='text-[10px] text-gray-500 truncate'>
+                            {JSON.parse(localStorage.getItem('user') || '{}').email || 'No email set'}
+                        </p>
                     </div>
                     <button className='p-1.5 hover:bg-[#262626] rounded-lg transition-colors'>
                         <MoreVertical className='size-4 text-gray-500' />

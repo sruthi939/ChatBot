@@ -5,6 +5,11 @@ import { assets } from '../assets/assets'
 
 const NewChatList = ({ onSelect }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{"name":"User"}');
+    const [searchTerm, setSearchTerm] = React.useState('');
+
+    const filteredSuggestions = Suggestions.filter(s => 
+        s.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
@@ -19,13 +24,15 @@ const NewChatList = ({ onSelect }) => {
                 <Search className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-500' />
                 <input 
                     type="text" 
-                    placeholder="Search chats..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search suggested topics..."
                     className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 transition-all text-sm'
                 />
             </div>
 
             <div className='space-y-4'>
-                {Suggestions.map((text, i) => (
+                {filteredSuggestions.map((text, i) => (
                     <div 
                         key={i} 
                         onClick={() => onSelect(text)}

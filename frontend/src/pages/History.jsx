@@ -6,6 +6,7 @@ import { assets } from '../assets/assets'
 
 const History = () => {
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = React.useState("All")
     const tabs = ["All", "Today", "Yesterday", "Last 7 Days"]
     
     return (
@@ -26,8 +27,9 @@ const History = () => {
                 {tabs.map((tab, i) => (
                     <button 
                         key={i}
+                        onClick={() => setActiveTab(tab)}
                         className={`px-6 py-3 rounded-2xl text-xs font-bold border transition-all whitespace-nowrap
-                            ${i === 0 
+                            ${activeTab === tab 
                                 ? 'bg-green-500/10 border-green-500/50 text-green-500' 
                                 : 'bg-[#171717] border-[#262626] text-gray-500 hover:border-gray-600'}`}
                     >
