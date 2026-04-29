@@ -1,8 +1,10 @@
 import React from 'react'
 import { Search, MessageSquare, MoreVertical } from 'lucide-react'
 import { Users } from '../lib/data'
+import { useNavigate } from 'react-router-dom'
 
 const History = () => {
+    const navigate = useNavigate();
     const tabs = ["All", "Today", "Yesterday", "Last 7 Days"]
     
     return (
@@ -33,13 +35,17 @@ const History = () => {
                     <h3 className='text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6 px-2'>Today</h3>
                     <div className='space-y-3'>
                         {Users.slice(0, 2).map((chat) => (
-                            <div key={chat.id} className='bg-[#171717] border border-[#262626] p-5 rounded-[32px] flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer'>
+                            <div 
+                                key={chat.id} 
+                                onClick={() => navigate('/')}
+                                className='bg-[#171717] border border-[#262626] p-5 rounded-[32px] flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer'
+                            >
                                 <div className='w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center border border-green-500/20'>
                                     <MessageSquare className='size-6 text-green-500' />
                                 </div>
                                 <div className='flex-1'>
                                     <h4 className='text-sm font-bold'>{chat.lastMessage}</h4>
-                                    <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp}</p>
+                                    <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp} • {chat.name}</p>
                                 </div>
                                 <button className='p-2 hover:bg-[#262626] rounded-xl'>
                                     <MoreVertical className='size-5 text-gray-500' />
@@ -53,13 +59,17 @@ const History = () => {
                     <h3 className='text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6 px-2'>Yesterday</h3>
                     <div className='space-y-3'>
                         {Users.slice(2, 4).map((chat) => (
-                            <div key={chat.id} className='bg-[#171717] border border-[#262626] p-5 rounded-[32px] flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer'>
+                            <div 
+                                key={chat.id} 
+                                onClick={() => navigate('/')}
+                                className='bg-[#171717] border border-[#262626] p-5 rounded-[32px] flex items-center gap-4 group hover:bg-[#1a1a1a] transition-all cursor-pointer'
+                            >
                                 <div className='w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center border border-green-500/20'>
                                     <MessageSquare className='size-6 text-green-500' />
                                 </div>
                                 <div className='flex-1'>
                                     <h4 className='text-sm font-bold'>{chat.lastMessage}</h4>
-                                    <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp}</p>
+                                    <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp} • {chat.name}</p>
                                 </div>
                                 <button className='p-2 hover:bg-[#262626] rounded-xl'>
                                     <MoreVertical className='size-5 text-gray-500' />
@@ -74,3 +84,4 @@ const History = () => {
 }
 
 export default History
+

@@ -1,18 +1,8 @@
 import React from 'react'
 import { PlusCircle, Search, MessageSquare, ChevronRight } from 'lucide-react'
+import { Suggestions } from '../lib/data'
 
 const NewChatList = ({ onSelect }) => {
-    const suggestions = [
-        "How can I improve my productivity?",
-        "Explain quantum computing",
-        "Write a python code",
-        "Best book recommendations",
-        "What is photosynthesis?",
-        "How does AI work?",
-        "Tips for better sleep",
-        "Travel guide for Japan"
-    ]
-
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
             <header className='flex items-center gap-4 mb-10'>
@@ -29,7 +19,7 @@ const NewChatList = ({ onSelect }) => {
             </div>
 
             <div className='space-y-4'>
-                {suggestions.map((text, i) => (
+                {Suggestions.map((text, i) => (
                     <div 
                         key={i} 
                         onClick={() => onSelect(text)}

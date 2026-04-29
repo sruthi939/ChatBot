@@ -1,7 +1,7 @@
 import React from 'react'
 import { LogOut } from 'lucide-react'
 
-const Profile = () => {
+const Profile = ({ onLogout }) => {
     const user = {
         name: "John Doe",
         email: "johndoe@gmail.com",
@@ -41,7 +41,10 @@ const Profile = () => {
                 </div>
 
                 <div className='flex justify-center relative z-10'>
-                    <button className='flex items-center gap-3 px-10 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl font-bold transition-all border border-red-500/20 active:scale-95'>
+                    <button 
+                        onClick={onLogout}
+                        className='flex items-center gap-3 px-10 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl font-bold transition-all border border-red-500/20 active:scale-95'
+                    >
                         <LogOut className='size-5' />
                         Log Out
                     </button>

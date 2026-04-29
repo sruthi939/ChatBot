@@ -9,7 +9,7 @@ import Bookmarks from './Bookmarks'
 import Settings from './Settings'
 import { useLocation } from 'react-router-dom'
 
-const HomePage = () => {
+const HomePage = ({ onLogout }) => {
     const [selectedUser, setSelectedUser] = useState(null)
     const location = useLocation()
 
@@ -21,17 +21,20 @@ const HomePage = () => {
 
         switch (location.pathname) {
             case '/profile':
-                return <Profile />
+                return <Profile onLogout={onLogout} />
             case '/new-chat':
-                return <NewChatList onSelect={(text) => setSelectedUser({ name: 'New Chat', lastMessage: text })} />
+                return <NewChatList onSelect={(text) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'user', text: text, timestamp: 'Just now' }] })} />
             case '/history':
                 return <History />
             case '/bookmarks':
                 return <Bookmarks />
             case '/settings':
-                return <Settings />
+                return <Settings onLogout={onLogout} />
             default:
-                return <Dashboard onNewChat={() => setSelectedUser({ name: 'New Chat' })} />
+                return <Dashboard 
+                    onNewChat={(title) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'bot', text: `How can I help you with ${title}?`, timestamp: 'Just now' }] })} 
+                    onSelectChat={setSelectedUser}
+                />
         }
     }
 

@@ -1,8 +1,5 @@
 import React from 'react'
-import { 
-    Home, PlusSquare, Clock, Bookmark, Settings, 
-    Crown, MoreVertical, MessageSquare 
-} from 'lucide-react'
+import { Home, SquarePlus, Clock, Bookmark, Settings, Crown, MoreVertical, MessageSquare } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, NavigationItems } from '../lib/data';
 
@@ -32,15 +29,15 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             <div className='px-4 mb-8'>
                 <div className='flex flex-col gap-1'>
                     {NavigationItems.map((item) => {
-                        const Icon = { Home, PlusSquare, Clock, Bookmark, Settings }[item.icon];
+                        const Icon = { Home, SquarePlus, Clock, Bookmark, Settings }[item.icon];
                         const isActive = location.pathname === `/${item.id}` || (item.id === 'home' && location.pathname === '/');
                         return (
                             <button
                                 key={item.id}
                                 onClick={() => navigate(item.id === 'home' ? '/' : `/${item.id}`)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                    ${isActive 
-                                        ? "bg-green-500/10 text-green-500" 
+                                    ${isActive
+                                        ? "bg-green-500/10 text-green-500"
                                         : "text-gray-500 hover:bg-[#1a1a1a] hover:text-white"}`}
                             >
                                 <Icon className={`size-5 ${isActive ? "text-green-500" : "text-gray-500 group-hover:text-white"}`} />
@@ -62,15 +59,15 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                             key={user.id}
                             onClick={() => setSelectedUser(user)}
                             className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 group
-                                ${user.id === selectedUser?.id 
-                                    ? "bg-[#1a1a1a] border border-[#262626]" 
+                                ${user.id === selectedUser?.id
+                                    ? "bg-[#1a1a1a] border border-[#262626]"
                                     : "hover:bg-[#1a1a1a] border border-transparent"}`}
                         >
                             <div className='relative flex-shrink-0'>
-                                <img 
-                                    src={user.avatar} 
-                                    alt={user.name} 
-                                    className='size-10 rounded-lg bg-[#1a1a1a]' 
+                                <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className='size-10 rounded-lg bg-[#1a1a1a]'
                                 />
                                 {user.status === 'online' && (
                                     <span className='absolute -bottom-0.5 -right-0.5 size-2.5 bg-green-500 border-2 border-[#0b0b0b] rounded-full' />
@@ -97,7 +94,10 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             {/* Bottom Section */}
             <div className='p-4 space-y-4'>
                 {/* Upgrade Pro Card */}
-                <div className='bg-gradient-to-br from-[#1a1a1a] to-[#0b0b0b] border border-[#262626] rounded-2xl p-4 relative overflow-hidden group cursor-pointer'>
+                <div 
+                    onClick={() => alert('Pro features coming soon!')}
+                    className='bg-gradient-to-br from-[#1a1a1a] to-[#0b0b0b] border border-[#262626] rounded-2xl p-4 relative overflow-hidden group cursor-pointer active:scale-95 transition-all'
+                >
                     <div className='absolute -right-4 -top-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-xl group-hover:bg-yellow-500/20 transition-all' />
                     <div className='relative z-10 flex flex-col gap-3'>
                         <div className='flex items-center gap-2'>
@@ -111,7 +111,10 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                 </div>
 
                 {/* User Profile */}
-                <div className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50'>
+                <div 
+                    onClick={() => navigate('/profile')}
+                    className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50 cursor-pointer hover:bg-[#1a1a1a] transition-all active:scale-95'
+                >
                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="User" className='size-10 rounded-xl' />
                     <div className='flex-1 min-w-0'>
                         <h4 className='text-sm font-bold truncate'>John Doe</h4>
@@ -128,4 +131,4 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
 
 export default Sidebar
 
-
+
