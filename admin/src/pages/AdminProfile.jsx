@@ -1,107 +1,162 @@
 import React, { useState } from 'react'
-import { User, Shield, Lock, Save, Camera } from 'lucide-react'
+import { Shield, Key, Mail, RefreshCcw } from 'lucide-react'
 import { API } from '../App'
 
 const AdminProfile = () => {
-    const admin = JSON.parse(localStorage.getItem('adminUser'));
-    const [passwords, setPasswords] = useState({ current: '', new: '' });
+    const user = JSON.parse(localStorage.getItem('adminUser'));
+    const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [loading, setLoading] = useState(false);
+    const [msg, setMsg] = useState({ text: '', type: '' });
 
-    const handleUpdatePassword = async (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
+        if (passwords.newPassword !== passwords.confirmPassword) {
+            return setMsg({ text: 'Passwords do not match', type: 'error' });
+        }
         setLoading(true);
         try {
-            // Reusing the user change-password endpoint as it's the same logic
             await API.post('/auth/change-password', {
-                userId: admin.id,
-                currentPassword: passwords.current,
-                newPassword: passwords.new
+                userId: user.id,
+                currentPassword: passwords.currentPassword,
+                newPassword: passwords.newPassword
             });
-            alert('Admin credentials updated successfully!');
-            setPasswords({ current: '', new: '' });
+            setMsg({ text: 'Security credentials updated successfully', type: 'success' });
+            setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
-            alert('Failed to update credentials. Check your current password.');
+            setMsg({ text: err.response?.data?.message || 'Update failed', type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
+    const cardStyle = {
+        backgroundColor: '#171717',
+        border: '1px solid #262626',
+        borderRadius: '32px',
+        padding: '40px',
+        marginTop: '32px'
+    };
+
+    const inputStyle = {
+        width: '100%',
+        backgroundColor: '#0b0b0b',
+        border: '1px solid #262626',
+        borderRadius: '16px',
+        padding: '16px 16px 16px 48px',
+        outline: 'none',
+        color: 'white',
+        fontSize: '14px',
+        marginTop: '8px'
+    };
+
+    const labelStyle = {
+        fontSize: '10px',
+        fontWeight: 'bold',
+        color: '#6b7280',
+        textTransform: 'uppercase',
+        letterSpacing: '1px',
+        marginLeft: '4px'
+    };
+
     return (
-        <div className='p-10 space-y-10 animate-in zoom-in-95 duration-500'>
+        <div style={{ animation: 'fadeIn 0.5s ease-in-out', maxWidth: '800px' }}>
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+            
             <div>
-                <h1 className='text-4xl font-bold'>Admin Security</h1>
-                <p className='text-gray-500 text-[10px] uppercase font-bold tracking-widest mt-1'>Manage console access and credentials</p>
+                <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>Security Center</h1>
+                <p style={{ color: '#6b7280', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', marginTop: '4px', letterSpacing: '1px' }}>Manage administrator credentials</p>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-10'>
-                {/* Profile Card */}
-                <div className='md:col-span-1 space-y-6'>
-                    <div className='bg-[#171717] border border-[#262626] rounded-[40px] p-10 flex flex-col items-center text-center'>
-                        <div className='relative group mb-6'>
-                            <div className='size-32 bg-green-500/10 rounded-[40px] border border-green-500/20 flex items-center justify-center'>
-                                <img src={admin.avatar} className='size-24 rounded-3xl' alt="" />
-                            </div>
-                            <div className='absolute bottom-0 right-0 p-2 bg-green-500 rounded-xl cursor-pointer hover:scale-110 transition-all'>
-                                <Camera size={16} className='text-black' />
-                            </div>
-                        </div>
-                        <h2 className='text-2xl font-bold'>{admin.name}</h2>
-                        <p className='text-xs text-gray-500 uppercase font-bold tracking-widest mt-1'>{admin.role} Authority</p>
-                        
-                        <div className='w-full h-px bg-[#262626] my-8' />
-                        
-                        <div className='w-full space-y-4'>
-                            <div className='flex items-center gap-3 text-left p-4 bg-[#0b0b0b] rounded-2xl border border-[#262626]'>
-                                <Shield className='text-green-500' size={18} />
-                                <div>
-                                    <p className='text-[10px] text-gray-500 font-bold uppercase'>Security Level</p>
-                                    <p className='text-sm font-bold'>Full Access</p>
-                                </div>
-                            </div>
+            <div style={cardStyle}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '48px' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '24px', overflow: 'hidden', border: '2px solid #22c55e' }}>
+                        <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{user.name}</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#22c55e', fontSize: '12px', fontWeight: 'bold', marginTop: '4px' }}>
+                            <Shield size={14} />
+                            <span>System Administrator</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Password Change */}
-                <div className='md:col-span-2 bg-[#171717] border border-[#262626] rounded-[40px] p-10'>
-                    <h3 className='font-bold mb-8 flex items-center gap-2'>
-                        <Lock className='text-red-500' size={18} />
-                        Rotate Access Keys
-                    </h3>
+                <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <label style={labelStyle}>Current Access Key</label>
+                        <Key style={{ position: 'absolute', left: '16px', top: '38px', color: '#4b5563' }} size={18} />
+                        <input 
+                            type="password" 
+                            placeholder="••••••••••••"
+                            required
+                            style={inputStyle}
+                            value={passwords.currentPassword}
+                            onChange={e => setPasswords({...passwords, currentPassword: e.target.value})}
+                        />
+                    </div>
 
-                    <form onSubmit={handleUpdatePassword} className='space-y-6'>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                            <div className='space-y-2'>
-                                <label className='text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1'>Current Access Key</label>
-                                <input 
-                                    type="password"
-                                    value={passwords.current}
-                                    onChange={e => setPasswords({...passwords, current: e.target.value})}
-                                    className='w-full bg-[#0b0b0b] border border-[#262626] p-4 rounded-2xl outline-none focus:border-red-500/50'
-                                    required
-                                />
-                            </div>
-                            <div className='space-y-2'>
-                                <label className='text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1'>New Access Key</label>
-                                <input 
-                                    type="password"
-                                    value={passwords.new}
-                                    onChange={e => setPasswords({...passwords, new: e.target.value})}
-                                    className='w-full bg-[#0b0b0b] border border-[#262626] p-4 rounded-2xl outline-none focus:border-red-500/50'
-                                    required
-                                />
-                            </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                        <div style={{ position: 'relative' }}>
+                            <label style={labelStyle}>New Access Key</label>
+                            <Key style={{ position: 'absolute', left: '16px', top: '38px', color: '#4b5563' }} size={18} />
+                            <input 
+                                type="password" 
+                                placeholder="••••••••••••"
+                                required
+                                style={inputStyle}
+                                value={passwords.newPassword}
+                                onChange={e => setPasswords({...passwords, newPassword: e.target.value})}
+                            />
                         </div>
+                        <div style={{ position: 'relative' }}>
+                            <label style={labelStyle}>Confirm New Key</label>
+                            <Key style={{ position: 'absolute', left: '16px', top: '38px', color: '#4b5563' }} size={18} />
+                            <input 
+                                type="password" 
+                                placeholder="••••••••••••"
+                                required
+                                style={inputStyle}
+                                value={passwords.confirmPassword}
+                                onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})}
+                            />
+                        </div>
+                    </div>
 
-                        <button 
-                            disabled={loading}
-                            className='flex items-center gap-3 px-10 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-all shadow-lg shadow-red-500/20 active:scale-95 disabled:opacity-50'
-                        >
-                            <Save size={20} />
-                            {loading ? 'Securing...' : 'Update Security Credentials'}
-                        </button>
-                    </form>
-                </div>
+                    {msg.text && (
+                        <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: msg.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', border: msg.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)' }}>
+                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 'bold', color: msg.type === 'error' ? '#ef4444' : '#22c55e', textAlign: 'center' }}>{msg.text}</p>
+                        </div>
+                    )}
+
+                    <button 
+                        type="submit" 
+                        disabled={loading}
+                        style={{
+                            padding: '18px',
+                            backgroundColor: '#22c55e',
+                            color: 'black',
+                            fontWeight: 'bold',
+                            borderRadius: '16px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                            marginTop: '12px',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {loading ? <RefreshCcw size={20} className="animate-spin" /> : <Shield size={20} />}
+                        Update Security Credentials
+                    </button>
+                </form>
             </div>
         </div>
     )
