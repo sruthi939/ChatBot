@@ -8,8 +8,11 @@ const ChatContainer = ({ selectedUser, onBack }) => {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [persona, setPersona] = useState('Architect');
     const [copiedId, setCopiedId] = useState(null);
     const messagesEndRef = useRef(null);
+
+    const personas = ['Architect', 'Creative', 'Analyst', 'Coach'];
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -53,7 +56,7 @@ const ChatContainer = ({ selectedUser, onBack }) => {
         setIsTyping(true);
 
         try {
-            const { data } = await sendMessageApi({ userId: user.id, text: inputText });
+            const { data } = await sendMessageApi({ userId: user.id, text: inputText, persona });
             setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
         } catch (err) {
             const errorMsg = {
@@ -95,12 +98,15 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                             <User className='text-green-500 size-6' />
                         )}
                     </div>
-                    <div>
+                     <div>
                         <h2 className='text-lg font-bold'>{selectedUser?.name || 'ChatBot AI'}</h2>
-                        <div className='flex items-center gap-1.5'>
-                            <div className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
-                            <span className='text-[10px] text-green-500 font-medium tracking-wide uppercase'>Online</span>
-                        </div>
+                        <select 
+                            value={persona}
+                            onChange={(e) => setPersona(e.target.value)}
+                            className='bg-transparent text-[10px] text-green-500 font-bold uppercase tracking-wider outline-none cursor-pointer hover:text-green-400'
+                        >
+                            {personas.map(p => <option key={p} value={p} className='bg-[#0b0b0b] text-white'>{p} Mode</option>)}
+                        </select>
                     </div>
                 </div>
                 <button 

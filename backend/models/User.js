@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    role: { type: String, default: 'user' }, // 'user' or 'admin'
+    currentPersona: { type: String, default: 'Architect' },
     avatar: { type: String, default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
     createdAt: { type: Date, default: Date.now }
 });
