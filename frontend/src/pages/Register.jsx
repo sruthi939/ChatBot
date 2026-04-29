@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, Mail, Lock, ShieldCheck, Github, Globe, Smartphone } from 'lucide-react'
+import { User, Mail, Lock, Shield } from 'lucide-react'
 
 const Register = ({ onLogin }) => {
     const [creds, setCreds] = useState({ name: '', email: '', password: '' });
@@ -53,7 +53,7 @@ const Register = ({ onLogin }) => {
         <div style={pageStyle}>
             <div style={cardStyle}>
                 <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: 'rgba(0,168,132,0.1)', borderRadius: '24px', marginBottom: '32px' }}>
-                    <ShieldCheck size={40} color="#00a884" />
+                    <Shield size={40} color="#00a884" />
                 </div>
 
                 <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Join Us</h1>
@@ -124,14 +124,8 @@ const Register = ({ onLogin }) => {
 
                 <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                    <span style={{ fontSize: '12px', color: '#8696a0', fontWeight: 'bold', textTransform: 'uppercase' }}>or register with</span>
+                    <span style={{ fontSize: '12px', color: '#8696a0', fontWeight: 'bold', textTransform: 'uppercase' }}>Secure AI Gateway</span>
                     <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '24px' }}>
-                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Globe size={20} color="#e9edef" /></div>
-                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Smartphone size={20} color="#e9edef" /></div>
-                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Github size={20} color="#e9edef" /></div>
                 </div>
 
                 <p style={{ marginTop: '40px', fontSize: '14px', color: '#8696a0' }}>
