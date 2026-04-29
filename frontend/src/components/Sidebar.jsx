@@ -2,6 +2,7 @@ import React from 'react'
 import { Home, SquarePlus, Clock, Bookmark, Settings, Crown, MoreVertical, MessageSquare } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, NavigationItems } from '../lib/data';
+import { assets } from '../assets/assets';
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
     const navigate = useNavigate();
@@ -11,10 +12,8 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         <div className={`w-[280px] h-full flex flex-col bg-[#0b0b0b] border-r border-[#1a1a1a] text-white transition-all duration-300 ${selectedUser ? "max-md:hidden" : ""}`}>
             {/* Header / Logo */}
             <div className='p-6 flex items-center gap-3'>
-                <div className='w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center'>
-                    <div className='w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center'>
-                        <span className='text-[10px] font-bold text-black'>AI</span>
-                    </div>
+                <div className='w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
                 </div>
                 <div>
                     <h2 className='text-lg font-bold tracking-tight'>ChatBot AI</h2>

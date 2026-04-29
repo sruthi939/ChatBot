@@ -2,11 +2,13 @@ import React from 'react'
 import { LogOut } from 'lucide-react'
 
 const Profile = ({ onLogout }) => {
-    const user = {
-        name: "John Doe",
-        email: "johndoe@gmail.com",
-        memberSince: "May 19, 2024",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
+    const user = JSON.parse(localStorage.getItem('user') || '{"name":"User", "email":"user@example.com"}');
+    
+    const profileData = {
+        name: user.name,
+        email: user.email,
+        memberSince: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "May 19, 2024",
+        avatar: user.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=John"
     }
 
     return (
@@ -18,7 +20,7 @@ const Profile = ({ onLogout }) => {
 
                 <div className='flex flex-col items-center mb-16 relative z-10'>
                     <div className='relative'>
-                        <img src={user.avatar} alt="Avatar" className='size-40 rounded-[40px] border-4 border-[#262626] shadow-2xl' />
+                        <img src={profileData.avatar} alt="Avatar" className='size-40 rounded-[40px] border-4 border-[#262626] shadow-2xl' />
                         <div className='absolute bottom-2 right-2 size-8 bg-green-500 rounded-full border-4 border-[#171717] flex items-center justify-center'>
                             <div className='size-3 bg-white rounded-full shadow-sm' />
                         </div>
@@ -28,15 +30,15 @@ const Profile = ({ onLogout }) => {
                 <div className='space-y-8 mb-16 relative z-10'>
                     <div className='flex justify-between items-center border-b border-[#262626] pb-4'>
                         <span className='text-gray-500 font-medium'>Full Name</span>
-                        <span className='font-bold'>{user.name}</span>
+                        <span className='font-bold'>{profileData.name}</span>
                     </div>
                     <div className='flex justify-between items-center border-b border-[#262626] pb-4'>
                         <span className='text-gray-500 font-medium'>Email</span>
-                        <span className='font-bold text-gray-400'>{user.email}</span>
+                        <span className='font-bold text-gray-400'>{profileData.email}</span>
                     </div>
                     <div className='flex justify-between items-center border-b border-[#262626] pb-4'>
                         <span className='text-gray-500 font-medium'>Member Since</span>
-                        <span className='font-bold'>{user.memberSince}</span>
+                        <span className='font-bold'>{profileData.memberSince}</span>
                     </div>
                 </div>
 

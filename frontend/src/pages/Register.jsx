@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { Mail, Lock, User, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { register as registerApi } from '../lib/api'
+import { assets } from '../assets/assets'
 
-const Register = () => {
+const Register = ({ onLogin }) => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -21,9 +22,10 @@ const Register = () => {
             const { data } = await registerApi({ name, email, password });
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            window.location.href = '/'; // Reload to pick up auth state
+            onLogin(data.user);
+            navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
         } finally {
             setIsLoading(false);
         }
@@ -32,10 +34,8 @@ const Register = () => {
     return (
         <div className='min-h-screen bg-[#0b0b0b] flex flex-col items-center p-10'>
             <div className='w-full max-w-sm flex flex-col items-center mt-12'>
-                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20'>
-                    <div className='w-12 h-12 bg-black rounded-2xl flex items-center justify-center'>
-                         <span className='text-green-500 font-bold text-xl'>AI</span>
-                    </div>
+                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20 overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
                 </div>
 
                 <h1 className='text-3xl font-bold mb-2'>Create Account</h1>

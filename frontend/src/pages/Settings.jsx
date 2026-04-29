@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronRight, LogOut } from 'lucide-react'
+import { assets } from '../assets/assets'
 
 const Settings = ({ onLogout }) => {
     const [preferences, setPreferences] = useState({
@@ -39,7 +40,10 @@ const Settings = ({ onLogout }) => {
 
     return (
         <div className='flex-1 bg-[#0b0b0b] p-8 overflow-y-auto custom-scrollbar'>
-            <header className='mb-10'>
+            <header className='flex items-center gap-4 mb-10'>
+                <div className='w-10 h-10 bg-green-500 rounded-xl overflow-hidden'>
+                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+                </div>
                 <h1 className='text-2xl font-bold'>Settings</h1>
             </header>
 
@@ -49,8 +53,8 @@ const Settings = ({ onLogout }) => {
                         <h3 className='text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6 px-2'>{section.title}</h3>
                         <div className='bg-[#171717] border border-[#262626] rounded-[32px] overflow-hidden'>
                             {section.items.map((item, j) => (
-                                <div 
-                                    key={j} 
+                                <div
+                                    key={j}
                                     onClick={() => {
                                         if (item.type === 'toggle') togglePreference(item.key);
                                         if (item.action) item.action();
@@ -60,7 +64,7 @@ const Settings = ({ onLogout }) => {
                                     <span className={`text-sm font-medium ${item.type === 'danger' ? 'text-red-500' : 'text-gray-200'}`}>
                                         {item.label}
                                     </span>
-                                    
+
                                     <div className='flex items-center gap-3'>
                                         {item.value && <span className='text-xs text-gray-500'>{item.value}</span>}
                                         {item.type === 'toggle' && (

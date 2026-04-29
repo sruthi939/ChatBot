@@ -12,6 +12,10 @@ router.post('/send', async (req, res) => {
     try {
         const { userId, text } = req.body;
 
+        if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key') {
+            return res.status(500).json({ error: 'OpenAI API Key is missing. Please add it to the backend .env file.' });
+        }
+
         // Save user message
         const userMsg = new Message({ user: userId, text, sender: 'user' });
         await userMsg.save();
@@ -19,7 +23,10 @@ router.post('/send', async (req, res) => {
         // Get AI response
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: text }],
+            messages: [
+                { role: "system", content: "You are a helpful and sleek AI assistant for a premium chat app. Keep your responses concise, professional, and friendly." },
+                { role: "user", content: text }
+            ],
         });
 
         const botText = completion.choices[0].message.content;
@@ -30,8 +37,8 @@ router.post('/send', async (req, res) => {
 
         res.json({ userMsg, botMsg });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'AI Error or Server Error' });
+        console.error('AI_ERROR:', err);
+        res.status(500).json({ error: 'AI processing failed. Check your API key or network connection.' });
     }
 });
 

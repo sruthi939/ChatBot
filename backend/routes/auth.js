@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
@@ -6,6 +7,12 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
     try {
+        if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key') {
+            return res.status(500).json({ error: 'JWT Secret is missing. Please add it to the backend .env file.' });
+        }
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(500).json({ error: 'Database not connected. Please ensure MongoDB is running.' });
+        }
         const { name, email, password } = req.body;
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: 'User already exists' });
@@ -24,6 +31,12 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
     try {
+        if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key') {
+            return res.status(500).json({ error: 'JWT Secret is missing. Please add it to the backend .env file.' });
+        }
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(500).json({ error: 'Database not connected. Please ensure MongoDB is running.' });
+        }
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
