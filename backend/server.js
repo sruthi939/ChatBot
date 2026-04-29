@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const User = require('./models/User');
 
 dotenv.config();
 
@@ -32,13 +33,26 @@ app.use((err, req, res, next) => {
 if (!process.env.MONGO_URI) {
     console.error('❌ Error: MONGO_URI is not defined in .env');
 } else {
-    // Aggressively remove all spaces that might have crept into the URI
-    const mongoUri = process.env.MONGO_URI.replace(/\s/g, '');
-    const redactedUri = mongoUri.replace(/\/\/(.*):(.*)@/, '//$1:****@');
-    console.log('📡 Attempting to connect to:', redactedUri);
-
-    mongoose.connect(mongoUri)
-        .then(() => console.log('✅ MongoDB Connected'))
+    mongoose.connect(process.env.MONGO_URI)
+        .then(async () => {
+            console.log('✅ MongoDB Connected');
+            // Seed Admin User
+            const adminEmail = process.env.Admin_Email;
+            const adminPassword = process.env.Admin_Password;
+            if (adminEmail && adminPassword) {
+                const adminExists = await User.findOne({ email: adminEmail });
+                if (!adminExists) {
+                    const admin = new User({
+                        name: 'System Admin',
+                        email: adminEmail,
+                        password: adminPassword,
+                        role: 'admin'
+                    });
+                    await admin.save();
+                    console.log('👑 Admin User Seeded Successfully');
+                }
+            }
+        })
         .catch(err => {
             console.error('❌ MongoDB Connection Error:', err.message);
         });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Terminal, RefreshCw, Eye } from 'lucide-react'
-import { API } from '../lib/api' // I should fix this import in App.jsx later
+import { API } from '../App'
 
 const SystemLogs = () => {
     const [logs, setLogs] = useState([]);
