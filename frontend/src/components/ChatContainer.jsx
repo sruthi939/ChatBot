@@ -2,14 +2,20 @@ import React, { useState, useEffect, useRef } from 'react'
 import { MoreVertical, Paperclip, Send, User, ChevronLeft, Copy, Check } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { sendMessage as sendMessageApi, getChatHistory } from '../lib/api'
+import { sendMessage as sendMessageApi, sendGroupMessage as sendGroupMessageApi, getChatHistory, generateImage as generateImageApi, analyzeFile as analyzeFileApi, addBookmark as addBookmarkApi } from '../lib/api'
+import { Image, Sparkles, Bookmark } from 'lucide-react'
 
 const ChatContainer = ({ selectedUser, onBack }) => {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [persona, setPersona] = useState('Architect');
+    const [isGroupMode, setIsGroupMode] = useState(false);
     const [copiedId, setCopiedId] = useState(null);
+    const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
     const messagesEndRef = useRef(null);
+
+    const personas = ['Architect', 'Creative', 'Analyst', 'Coach'];
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -53,8 +59,21 @@ const ChatContainer = ({ selectedUser, onBack }) => {
         setIsTyping(true);
 
         try {
-            const { data } = await sendMessageApi({ userId: user.id, text: inputText });
-            setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+            if (isGroupMode) {
+                const { data } = await sendGroupMessageApi({ userId: user.id, text: inputText });
+                const newBotMsgs = data.botMessages.map(m => ({
+                    ...m,
+                    timestamp: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }));
+                setMessages(prev => [...prev, ...newBotMsgs]);
+            } else if (inputText.startsWith('/image ')) {
+                const prompt = inputText.replace('/image ', '');
+                const { data } = await generateImageApi({ userId: user.id, prompt });
+                setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+            } else {
+                const { data } = await sendMessageApi({ userId: user.id, text: inputText, persona });
+                setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+            }
         } catch (err) {
             const errorMsg = {
                 id: Date.now() + 1,
@@ -68,10 +87,58 @@ const ChatContainer = ({ selectedUser, onBack }) => {
         }
     };
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsTyping(true);
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userMsg = {
+            id: Date.now(),
+            sender: 'user',
+            text: `📁 Uploaded file: **${file.name}**\n*Analyzing content...*`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, userMsg]);
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('prompt', "Please summarize this document.");
+
+        try {
+            const { data } = await analyzeFileApi(formData);
+            const botMsg = {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: `### Document Summary: ${data.fileName}\n\n${data.analysis}`,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            setMessages(prev => [...prev, botMsg]);
+        } catch (err) {
+            alert('Failed to analyze document');
+        } finally {
+            setIsTyping(false);
+        }
+    };
+
     const copyToClipboard = (text, id) => {
         navigator.clipboard.writeText(text);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleBookmark = async (msg) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        try {
+            await addBookmarkApi({ 
+                userId: user.id, 
+                title: msg.text.substring(0, 40) + '...', 
+                text: msg.text 
+            });
+            setBookmarkedIds(prev => new Set([...prev, msg.id]));
+        } catch (err) {
+            alert('Failed to save bookmark');
+        }
     };
 
     const clearChat = () => {
@@ -95,21 +162,37 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                             <User className='text-green-500 size-6' />
                         )}
                     </div>
-                    <div>
+                     <div>
                         <h2 className='text-lg font-bold'>{selectedUser?.name || 'ChatBot AI'}</h2>
-                        <div className='flex items-center gap-1.5'>
-                            <div className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
-                            <span className='text-[10px] text-green-500 font-medium tracking-wide uppercase'>Online</span>
-                        </div>
+                        <select 
+                            value={persona}
+                            onChange={(e) => setPersona(e.target.value)}
+                            className='bg-transparent text-[10px] text-green-500 font-bold uppercase tracking-wider outline-none cursor-pointer hover:text-green-400'
+                        >
+                             {personas.map(p => <option key={p} value={p} className='bg-[#0b0b0b] text-white'>{p} Mode</option>)}
+                        </select>
                     </div>
                 </div>
-                <button 
-                    onClick={clearChat}
-                    className='p-2 hover:bg-red-500/10 rounded-xl transition-colors group'
-                    title="Clear Chat"
-                >
-                    <MoreVertical className='size-5 text-gray-500 group-hover:text-red-500' />
-                </button>
+                
+                <div className='flex items-center gap-4'>
+                    <button 
+                        onClick={() => setIsGroupMode(!isGroupMode)}
+                        className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-[10px] font-bold uppercase tracking-wider
+                            ${isGroupMode 
+                                ? 'bg-violet-500/10 border-violet-500/50 text-violet-500' 
+                                : 'bg-[#171717] border-[#262626] text-gray-500 hover:border-gray-600'}`}
+                    >
+                        <div className={`size-2 rounded-full ${isGroupMode ? 'bg-violet-500 animate-pulse' : 'bg-gray-600'}`} />
+                        Group Brainstorming
+                    </button>
+
+                    <button 
+                        onClick={onBack}
+                        className='p-3 bg-[#171717] border border-[#262626] rounded-2xl hover:bg-[#262626] transition-all text-gray-500'
+                    >
+                        <MoreVertical className='size-5' />
+                    </button>
+                </div>
             </div>
 
             {/* Messages Area */}
@@ -130,16 +213,26 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                                 </div>
                                 
                                 {msg.sender === 'bot' && (
-                                    <button 
-                                        onClick={() => copyToClipboard(msg.text, msg.id)}
-                                        className='absolute -right-10 top-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#1a1a1a] rounded-lg'
-                                    >
-                                        {copiedId === msg.id ? (
-                                            <Check className='size-4 text-green-500' />
-                                        ) : (
-                                            <Copy className='size-4 text-gray-500' />
-                                        )}
-                                    </button>
+                                    <div className='absolute -right-20 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
+                                        <button 
+                                            onClick={() => copyToClipboard(msg.text, msg.id)}
+                                            className='p-2 hover:bg-[#1a1a1a] rounded-lg'
+                                            title="Copy to Clipboard"
+                                        >
+                                            {copiedId === msg.id ? (
+                                                <Check className='size-4 text-green-500' />
+                                            ) : (
+                                                <Copy className='size-4 text-gray-500' />
+                                            )}
+                                        </button>
+                                        <button 
+                                            onClick={() => handleBookmark(msg)}
+                                            className='p-2 hover:bg-[#1a1a1a] rounded-lg'
+                                            title="Save to Bookmarks"
+                                        >
+                                            <Bookmark className={`size-4 ${bookmarkedIds.has(msg.id) ? 'text-green-500 fill-green-500' : 'text-gray-500'}`} />
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                             <div className='flex items-center gap-2 mt-2 px-1'>
@@ -168,16 +261,24 @@ const ChatContainer = ({ selectedUser, onBack }) => {
                     <button 
                         onClick={() => document.getElementById('fileInput').click()}
                         className='p-3 hover:bg-[#262626] rounded-xl transition-colors'
+                        title="Attach File"
                     >
                         <Paperclip className='size-5 text-gray-500' />
                         <input 
                             id="fileInput" 
                             type="file" 
                             className='hidden' 
-                            onChange={(e) => {
-                                if (e.target.files[0]) alert(`Selected file: ${e.target.files[0].name}. (Backend processing coming soon!)`);
-                            }}
+                            accept=".pdf,.txt"
+                            onChange={handleFileUpload}
                         />
+                    </button>
+
+                    <button 
+                        onClick={() => setInputText('/image ')}
+                        className='p-3 hover:bg-[#262626] rounded-xl transition-colors group'
+                        title="Generate AI Image"
+                    >
+                        <Image className='size-5 text-gray-500 group-hover:text-blue-500' />
                     </button>
                     <input 
                         type="text" 
