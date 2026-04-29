@@ -165,8 +165,19 @@ const ChatContainer = ({ selectedUser, onBack }) => {
             {/* Input Area */}
             <div className='p-6 pt-0'>
                 <div className='bg-[#171717] border border-[#262626] rounded-2xl p-2 flex items-center gap-2 shadow-2xl focus-within:border-green-500/50 transition-all'>
-                    <button className='p-3 hover:bg-[#262626] rounded-xl transition-colors'>
+                    <button 
+                        onClick={() => document.getElementById('fileInput').click()}
+                        className='p-3 hover:bg-[#262626] rounded-xl transition-colors'
+                    >
                         <Paperclip className='size-5 text-gray-500' />
+                        <input 
+                            id="fileInput" 
+                            type="file" 
+                            className='hidden' 
+                            onChange={(e) => {
+                                if (e.target.files[0]) alert(`Selected file: ${e.target.files[0].name}. (Backend processing coming soon!)`);
+                            }}
+                        />
                     </button>
                     <input 
                         type="text" 
