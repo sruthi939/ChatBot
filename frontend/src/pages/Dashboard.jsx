@@ -2,9 +2,11 @@ import React from 'react'
 import { MessageSquare, Zap, TrendingUp, ChevronRight, MoreVertical } from 'lucide-react'
 import { Users } from '../lib/data'
 import { assets } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
 
 const Dashboard = ({ onNewChat, onSelectChat }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{"name":"User"}');
+    const navigate = useNavigate();
     
     const features = [
         { title: 'Smart Conversations', desc: 'Chat with our AI assistant on anything.', icon: <MessageSquare className='text-violet-500' />, bg: 'bg-violet-500/10' },
@@ -43,7 +45,10 @@ const Dashboard = ({ onNewChat, onSelectChat }) => {
             <section>
                 <div className='flex justify-between items-center mb-6'>
                     <h2 className='text-lg font-bold'>Recent Chats</h2>
-                    <button className='text-green-500 text-xs font-bold hover:underline flex items-center gap-1'>
+                    <button 
+                        onClick={() => navigate('/history')}
+                        className='text-green-500 text-xs font-bold hover:underline flex items-center gap-1'
+                    >
                         View all <ChevronRight className='size-3' />
                     </button>
                 </div>
