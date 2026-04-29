@@ -20,15 +20,13 @@ export const API = axios.create({ baseURL: 'http://localhost:5000/api' });
 
 function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('adminUser')));
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (adminCreds) => {
     try {
-      const { data } = await API.post('/auth/login', credentials);
+      const { data } = await API.post('/auth/login', adminCreds);
       if (data.user.role !== 'admin') {
         setError('Access Denied: Not an Admin');
         return;
