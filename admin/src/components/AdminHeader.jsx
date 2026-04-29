@@ -1,35 +1,42 @@
+import React from 'react'
 import { Search, Bell, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const AdminHeader = ({ user }) => {
+    const headerStyle = {
+        height: '80px',
+        width: '100%',
+        backgroundColor: 'rgba(11,11,11,0.8)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid #262626',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: '0 40px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50
+    };
+
     return (
-        <header className='h-24 border-b border-[#262626] bg-[#0b0b0b]/80 backdrop-blur-xl flex items-center justify-between px-10 sticky top-0 z-20'>
-            <div className='flex items-center gap-4 flex-1'>
-                <div className='relative w-full max-w-md group'>
-                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 size-4 text-gray-600 group-focus-within:text-green-500 transition-colors' />
-                    <input 
-                        type="text" 
-                        placeholder="Search system records..." 
-                        className='w-full bg-[#171717] border border-[#262626] p-3 pl-12 rounded-2xl outline-none focus:border-green-500/50 text-sm'
-                    />
-                </div>
-            </div>
-
-            <div className='flex items-center gap-6'>
-                <button className='p-3 bg-[#171717] border border-[#262626] rounded-2xl hover:bg-[#1a1a1a] transition-all relative text-gray-400'>
-                    <Bell size={20} />
-                    <div className='absolute top-3 right-3 size-2 bg-green-500 rounded-full border-2 border-[#171717]' />
-                </button>
+        <header style={headerStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                <Search style={{ color: '#6b7280', cursor: 'pointer' }} size={20} />
+                <Bell style={{ color: '#6b7280', cursor: 'pointer' }} size={20} />
                 
-                <div className='h-10 w-px bg-[#262626]' />
+                <div style={{ height: '40px', width: '1px', backgroundColor: '#262626' }} />
 
-                <Link to="/profile" className='flex items-center gap-4 hover:opacity-80 transition-opacity'>
-                    <div className='text-right hidden md:block'>
-                        <p className='text-sm font-bold'>{user.name}</p>
-                        <p className='text-[10px] text-gray-500 uppercase font-bold tracking-widest'>{user.role}</p>
+                <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none', color: 'white' }}>
+                    <div style={{ textAlign: 'right', display: 'none', md: 'block' }}>
+                        <p style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>{user.name}</p>
+                        <p style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', fontWeight: 'bold', margin: 0 }}>{user.role}</p>
                     </div>
-                    <div className='size-12 bg-green-500/10 rounded-2xl border border-green-500/20 flex items-center justify-center'>
-                        <img src={user.avatar} className='size-10 rounded-xl' alt="" />
+                    <div style={{ width: '48px', height: '48px', backgroundColor: 'rgba(34,197,94,0.1)', borderRadius: '16px', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyItems: 'center', overflow: 'hidden' }}>
+                        <img 
+                            src={user.avatar} 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                            alt="Admin" 
+                        />
                     </div>
                 </Link>
             </div>
