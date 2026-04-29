@@ -1,5 +1,5 @@
 import React from 'react'
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Shield } from 'lucide-react'
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Shield, TrendingUp, Terminal } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 const Sidebar = ({ onLogout }) => {
@@ -8,7 +8,7 @@ const Sidebar = ({ onLogout }) => {
         { id: 'users', label: 'Users', icon: <Users size={20} /> },
         { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={20} /> },
         { id: 'broadcast', label: 'Broadcast', icon: <Megaphone size={20} /> },
-        { id: 'logs', label: 'System Logs', icon: <LayoutDashboard size={20} /> },
+        { id: 'logs', label: 'System Logs', icon: <Terminal size={20} /> },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ]
 
