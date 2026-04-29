@@ -8,8 +8,20 @@ function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('adminUser')));
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [stats, setStats] = useState(null);
+  const [broadcastMsg, setBroadcastMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const sendBroadcast = async () => {
+    if (!broadcastMsg) return;
+    try {
+      await API.post('/admin/broadcast', { message: broadcastMsg }, { headers: { 'user-id': user.id } });
+      alert('Broadcast sent!');
+      setBroadcastMsg('');
+    } catch (err) {
+      alert('Failed to send broadcast');
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -109,6 +121,28 @@ function App() {
             <h2 className="text-3xl font-bold">{c.val}</h2>
           </div>
         ))}
+      </div>
+
+      <div className="bg-[#171717] border border-[#262626] rounded-[40px] p-10 mb-12">
+          <h3 className="font-bold mb-6 flex items-center gap-2">
+            <div className="size-2 bg-red-500 rounded-full animate-pulse" />
+            System Broadcast Console
+          </h3>
+          <div className="flex gap-4">
+            <input 
+              type="text" 
+              value={broadcastMsg}
+              onChange={e => setBroadcastMsg(e.target.value)}
+              placeholder="Type an announcement to all users..."
+              className="flex-1 bg-[#0b0b0b] border border-[#262626] p-5 rounded-3xl outline-none focus:border-red-500/50"
+            />
+            <button 
+              onClick={sendBroadcast}
+              className="px-8 bg-red-500 hover:bg-red-600 text-white font-bold rounded-3xl transition-all shadow-lg shadow-red-500/20"
+            >
+              Broadcast Now
+            </button>
+          </div>
       </div>
 
       <div className="bg-[#171717] border border-[#262626] rounded-[40px] overflow-hidden">

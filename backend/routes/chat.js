@@ -40,9 +40,15 @@ router.post('/send', async (req, res) => {
         });
 
         const botText = completion.choices[0].message.content;
+        const totalTokens = completion.usage.total_tokens;
 
-        // Save bot response
-        const botMsg = new Message({ user: userId, text: botText, sender: 'bot' });
+        // Save bot response with token count
+        const botMsg = new Message({
+            user: userId,
+            text: botText,
+            sender: 'bot',
+            tokens: totalTokens
+        });
         await botMsg.save();
 
         res.json({ userMsg, botMsg });
