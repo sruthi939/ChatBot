@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, default: 'user' }, // 'user' or 'admin'
     currentPersona: { type: String, default: 'Architect' },
+    bookmarks: [{
+        title: String,
+        text: String,
+        date: { type: Date, default: Date.now }
+    }],
     avatar: { type: String, default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
     createdAt: { type: Date, default: Date.now }
 });
