@@ -1,10 +1,20 @@
-import { UserCheck, UserX, Eye, Download } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import React from 'react'
+import { UserCheck, UserX, Eye, Download, SearchX } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 
 const Users = ({ users, onToggleStatus }) => {
+    const location = useLocation();
+    const query = new URLSearchParams(location.search).get('search')?.toLowerCase() || '';
+
+    // Filter users based on search query
+    const filteredUsers = users.filter(u => 
+        u.name.toLowerCase().includes(query) || 
+        u.email.toLowerCase().includes(query)
+    );
+
     const exportToCSV = () => {
         const headers = ["Name,Email,Role,Joined\n"];
-        const rows = users.map(u => `${u.name},${u.email},${u.role},${u.createdAt}\n`);
+        const rows = filteredUsers.map(u => `${u.name},${u.email},${u.role},${u.createdAt}\n`);
         const blob = new Blob([headers, ...rows], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -21,15 +31,6 @@ const Users = ({ users, onToggleStatus }) => {
         marginTop: '32px'
     };
 
-    const tableHeaderStyle = {
-        backgroundColor: '#1a1a1a',
-        fontSize: '10px',
-        textTransform: 'uppercase',
-        letterSpacing: '2px',
-        color: '#6b7280',
-        textAlign: 'left'
-    };
-
     return (
         <div style={{ animation: 'fadeIn 0.5s ease-in-out' }}>
             <style>{`
@@ -41,33 +42,44 @@ const Users = ({ users, onToggleStatus }) => {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>User Management</h1>
-                    <p style={{ color: '#6b7280', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', marginTop: '4px', letterSpacing: '1px' }}>Audit and control system access</p>
+                    <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>
+                        {query ? 'Search Results' : 'User Management'}
+                    </h1>
+                    <p style={{ color: '#6b7280', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', marginTop: '4px', letterSpacing: '1px' }}>
+                        {query ? `Showing results for "${query}"` : 'Audit and control system access'}
+                    </p>
                 </div>
-                <button 
-                    onClick={exportToCSV}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px 24px',
-                        backgroundColor: '#171717',
-                        border: '1px solid #262626',
-                        borderRadius: '16px',
-                        color: '#6b7280',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    <Download size={14} />
-                    Export Audit Log
-                </button>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    {query && (
+                        <Link to="/users" style={{ padding: '12px 24px', backgroundColor: '#262626', borderRadius: '16px', color: 'white', fontSize: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+                            Clear Search
+                        </Link>
+                    )}
+                    <button 
+                        onClick={exportToCSV}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '12px 24px',
+                            backgroundColor: '#171717',
+                            border: '1px solid #262626',
+                            borderRadius: '16px',
+                            color: '#6b7280',
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <Download size={14} />
+                        Export Audit Log
+                    </button>
+                </div>
             </div>
 
             <div style={cardStyle}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead style={tableHeaderStyle}>
+                    <thead style={{ backgroundColor: '#1a1a1a', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '2px', color: '#6b7280', textAlign: 'left' }}>
                         <tr>
                             <th style={{ padding: '24px 32px' }}>Account</th>
                             <th style={{ padding: '24px 32px' }}>Status</th>
@@ -76,7 +88,7 @@ const Users = ({ users, onToggleStatus }) => {
                         </tr>
                     </thead>
                     <tbody style={{ color: '#9ca3af' }}>
-                        {users.map(u => (
+                        {filteredUsers.map(u => (
                             <tr key={u._id} style={{ borderTop: '1px solid #262626' }}>
                                 <td style={{ padding: '24px 32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
                                     <div style={{ width: '48px', height: '48px', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#0b0b0b' }}>
@@ -131,6 +143,14 @@ const Users = ({ users, onToggleStatus }) => {
                                 </td>
                             </tr>
                         ))}
+                        {filteredUsers.length === 0 && (
+                            <tr>
+                                <td colSpan="4" style={{ padding: '60px', textAlign: 'center' }}>
+                                    <SearchX size={40} style={{ color: '#262626', marginBottom: '16px' }} />
+                                    <p style={{ margin: 0, color: '#4b5563', fontWeight: 'bold' }}>No users found matching your search.</p>
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
