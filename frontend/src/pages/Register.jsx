@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { User, Mail, Lock, Shield } from 'lucide-react'
 
-const Register = ({ onLogin }) => {
+const Register = ({ onRegister, error }) => {
     const [creds, setCreds] = useState({ name: '', email: '', password: '' });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onLogin();
+        onRegister(creds);
     };
 
     const pageStyle = {
@@ -32,11 +32,6 @@ const Register = ({ onLogin }) => {
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
     };
 
-    const inputContainer = {
-        position: 'relative',
-        marginBottom: '20px'
-    };
-
     const inputStyle = {
         width: '100%',
         backgroundColor: '#2a3942',
@@ -59,8 +54,14 @@ const Register = ({ onLogin }) => {
                 <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Join Us</h1>
                 <p style={{ color: '#8696a0', fontSize: '14px', marginBottom: '40px' }}>Create your account to start secure AI messaging</p>
 
+                {error && (
+                    <div style={{ padding: '12px', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, color: '#ef4444', fontSize: '13px', fontWeight: 'bold' }}>{error}</p>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
-                    <div style={inputContainer}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
                         <User style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="text" 
@@ -69,12 +70,10 @@ const Register = ({ onLogin }) => {
                             style={inputStyle}
                             value={creds.name}
                             onChange={(e) => setCreds({...creds, name: e.target.value})}
-                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
 
-                    <div style={inputContainer}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
                         <Mail style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="email" 
@@ -83,12 +82,10 @@ const Register = ({ onLogin }) => {
                             style={inputStyle}
                             value={creds.email}
                             onChange={(e) => setCreds({...creds, email: e.target.value})}
-                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
 
-                    <div style={inputContainer}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
                         <Lock style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="password" 
@@ -97,8 +94,6 @@ const Register = ({ onLogin }) => {
                             style={inputStyle}
                             value={creds.password}
                             onChange={(e) => setCreds({...creds, password: e.target.value})}
-                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
 
@@ -114,19 +109,12 @@ const Register = ({ onLogin }) => {
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '16px',
-                            marginTop: '12px',
-                            transition: 'transform 0.2s'
+                            marginTop: '12px'
                         }}
                     >
                         Create Account
                     </button>
                 </form>
-
-                <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                    <span style={{ fontSize: '12px', color: '#8696a0', fontWeight: 'bold', textTransform: 'uppercase' }}>Secure AI Gateway</span>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                </div>
 
                 <p style={{ marginTop: '40px', fontSize: '14px', color: '#8696a0' }}>
                     Already have an account? <Link to="/login" style={{ color: '#00a884', textDecoration: 'none', fontWeight: 'bold' }}>Sign In</Link>

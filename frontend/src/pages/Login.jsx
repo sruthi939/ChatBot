@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react'
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, error }) => {
     const [showPass, setShowPass] = useState(false);
     const [creds, setCreds] = useState({ email: '', password: '' });
 
@@ -33,11 +33,6 @@ const Login = ({ onLogin }) => {
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
     };
 
-    const inputContainer = {
-        position: 'relative',
-        marginBottom: '20px'
-    };
-
     const inputStyle = {
         width: '100%',
         backgroundColor: '#2a3942',
@@ -53,7 +48,6 @@ const Login = ({ onLogin }) => {
     return (
         <div style={pageStyle}>
             <div style={cardStyle}>
-                {/* Logo */}
                 <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: 'rgba(0,168,132,0.1)', borderRadius: '24px', marginBottom: '32px' }}>
                     <Shield size={40} color="#00a884" />
                 </div>
@@ -61,8 +55,14 @@ const Login = ({ onLogin }) => {
                 <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Welcome Back</h1>
                 <p style={{ color: '#8696a0', fontSize: '14px', marginBottom: '40px' }}>Sign in to continue your secure chat session</p>
 
+                {error && (
+                    <div style={{ padding: '12px', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, color: '#ef4444', fontSize: '13px', fontWeight: 'bold' }}>{error}</p>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
-                    <div style={inputContainer}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
                         <Mail style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="email" 
@@ -71,12 +71,10 @@ const Login = ({ onLogin }) => {
                             style={inputStyle}
                             value={creds.email}
                             onChange={(e) => setCreds({...creds, email: e.target.value})}
-                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
 
-                    <div style={inputContainer}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
                         <Lock style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type={showPass ? "text" : "password"} 
@@ -85,13 +83,8 @@ const Login = ({ onLogin }) => {
                             style={inputStyle}
                             value={creds.password}
                             onChange={(e) => setCreds({...creds, password: e.target.value})}
-                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
-                        <div 
-                            onClick={() => setShowPass(!showPass)}
-                            style={{ position: 'absolute', right: '18px', top: '18px', color: '#8696a0', cursor: 'pointer' }}
-                        >
+                        <div onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '18px', top: '18px', color: '#8696a0', cursor: 'pointer' }}>
                             {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
                         </div>
                     </div>
@@ -108,19 +101,12 @@ const Login = ({ onLogin }) => {
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '16px',
-                            marginTop: '12px',
-                            transition: 'transform 0.2s'
+                            marginTop: '12px'
                         }}
                     >
                         Sign In
                     </button>
                 </form>
-
-                <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                    <span style={{ fontSize: '12px', color: '#8696a0', fontWeight: 'bold', textTransform: 'uppercase' }}>Secure AI Gateway</span>
-                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-                </div>
 
                 <p style={{ marginTop: '40px', fontSize: '14px', color: '#8696a0' }}>
                     Don't have an account? <Link to="/signup" style={{ color: '#00a884', textDecoration: 'none', fontWeight: 'bold' }}>Sign Up</Link>

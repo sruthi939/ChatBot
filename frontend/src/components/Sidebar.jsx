@@ -1,15 +1,21 @@
 import React from 'react'
-import { Search, MoreVertical, MessageSquarePlus, Filter, CheckCheck } from 'lucide-react'
+import { Search, MoreVertical, MessageSquarePlus, CheckCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-const Sidebar = ({ selectedUser, setSelectedUser }) => {
+const Sidebar = ({ selectedUser, setSelectedUser, lastMessage }) => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    const recentChats = [
-        { id: 'ai', name: 'Neural Core AI', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', lastMsg: 'I am ready for your commands.', time: '12:45 PM', unread: 1, online: true },
-        { id: 'support', name: 'System Security', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Support', lastMsg: 'Access granted successfully.', time: 'Yesterday', unread: 0, online: false },
-        { id: 'dev', name: 'Global Engine', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dev', lastMsg: 'Optimization complete.', time: 'Monday', unread: 0, online: true }
+    // Real-time dynamic chat list based on database activity
+    const chats = [
+        { 
+            id: 'ai', 
+            name: 'Neural Core AI', 
+            avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', 
+            lastMsg: lastMessage?.text || 'Start a new conversation...', 
+            time: lastMessage ? new Date(lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now',
+            online: true 
+        }
     ];
 
     const sidebarStyle = {
@@ -53,7 +59,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
 
             {/* List */}
             <div style={{ flex: 1, overflowY: 'auto' }}>
-                {recentChats.map((chat) => (
+                {chats.map((chat) => (
                     <div 
                         key={chat.id}
                         onClick={() => setSelectedUser(chat)}
@@ -66,8 +72,6 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                             backgroundColor: selectedUser?.id === chat.id ? '#2a3942' : 'transparent',
                             transition: 'background 0.2s'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = selectedUser?.id === chat.id ? '#2a3942' : '#202c33'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedUser?.id === chat.id ? '#2a3942' : 'transparent'}
                     >
                         <div style={{ position: 'relative', flexShrink: 0 }}>
                             <img src={chat.avatar} style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#202c33' }} alt="" />
@@ -76,18 +80,13 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                         <div style={{ flex: 1, minWidth: 0, paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                 <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '500', color: '#e9edef', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.name}</h4>
-                                <span style={{ fontSize: '12px', color: chat.unread > 0 ? '#00a884' : '#8696a0', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
+                                <span style={{ fontSize: '12px', color: '#8696a0' }}>{chat.time}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center', overflow: 'hidden' }}>
                                     <CheckCheck size={16} color="#53bdeb" style={{ flexShrink: 0 }} />
                                     <p style={{ margin: 0, fontSize: '14px', color: '#8696a0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.lastMsg}</p>
                                 </div>
-                                {chat.unread > 0 && (
-                                    <div style={{ minWidth: '20px', height: '20px', backgroundColor: '#00a884', color: 'black', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', padding: '0 6px' }}>
-                                        {chat.unread}
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

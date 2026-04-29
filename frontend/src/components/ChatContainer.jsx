@@ -10,6 +10,12 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const formatTime = (timestamp) => {
+        if (!timestamp) return '';
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
     const handleSend = (e) => {
         e.preventDefault();
         if (input.trim() && !loading) {
@@ -20,8 +26,8 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
 
     return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#0b141a', position: 'relative' }}>
-            {/* Doodle Background Layer */}
-            <div className="chat-bg" style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', backgroundBlendMode: 'overlay' }} />
+            {/* Background Pattern */}
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', backgroundBlendMode: 'overlay', pointerEvents: 'none' }} />
 
             {/* Header */}
             <header style={{ height: '60px', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#202c33', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -47,17 +53,21 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
                     <div key={i} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
                         <div style={{
                             position: 'relative',
-                            padding: '8px 12px 14px 12px',
-                            borderRadius: '8px',
-                            maxWidth: '65%',
-                            fontSize: '14.5px',
+                            padding: '10px 16px 20px 16px',
+                            borderRadius: '12px',
+                            maxWidth: '70%',
+                            minWidth: '100px',
+                            fontSize: '15px',
                             boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)',
                             backgroundColor: msg.sender === 'user' ? '#005c4b' : '#202c33',
-                            color: '#e9edef'
+                            color: '#e9edef',
+                            wordBreak: 'break-word'
                         }}>
-                            <p style={{ margin: 0, paddingRight: '48px', lineHeight: '1.5' }}>{msg.text}</p>
-                            <div style={{ position: 'absolute', bottom: '4px', right: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{msg.timestamp}</span>
+                            <p style={{ margin: 0, paddingRight: '20px', lineHeight: '1.5' }}>{msg.text}</p>
+                            <div style={{ position: 'absolute', bottom: '4px', right: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
+                                    {formatTime(msg.timestamp)}
+                                </span>
                                 {msg.sender === 'user' && <CheckCheck size={14} color="#53bdeb" />}
                             </div>
                         </div>
@@ -65,7 +75,7 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
                 ))}
                 {loading && (
                     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                        <div style={{ padding: '12px 16px', borderRadius: '8px', backgroundColor: '#202c33', display: 'flex', gap: '4px' }}>
+                        <div style={{ padding: '12px 16px', borderRadius: '12px', backgroundColor: '#202c33', display: 'flex', gap: '6px' }}>
                             <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%' }} />
                             <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.2s' }} />
                             <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.4s' }} />
@@ -76,7 +86,7 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
             </div>
 
             {/* Input Footer */}
-            <footer style={{ padding: '8px 16px', backgroundColor: '#202c33', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 10 }}>
+            <footer style={{ padding: '10px 16px', backgroundColor: '#202c33', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 10 }}>
                 <div style={{ display: 'flex', gap: '16px', color: '#aebac1' }}>
                     <Smile size={24} style={{ cursor: 'pointer' }} />
                     <Paperclip size={24} style={{ cursor: 'pointer' }} />
@@ -91,8 +101,8 @@ const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
                             backgroundColor: '#2a3942',
                             border: 'none',
                             outline: 'none',
-                            padding: '10px 16px',
-                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
                             color: '#d1d7db',
                             fontSize: '15px'
                         }}
