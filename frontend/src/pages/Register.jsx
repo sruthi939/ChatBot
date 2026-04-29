@@ -1,91 +1,141 @@
 import React, { useState } from 'react'
-import { Mail, Lock, User, Shield } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { register as registerApi } from '../lib/api'
-import { assets } from '../assets/assets'
+import { Link } from 'react-router-dom'
+import { User, Mail, Lock, ShieldCheck, Github, Globe, Smartphone } from 'lucide-react'
 
 const Register = ({ onLogin }) => {
-    const navigate = useNavigate();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [creds, setCreds] = useState({ name: '', email: '', password: '' });
 
-    const handleRegister = async () => {
-        if (!name || !email || !password) return setError('Please fill in all fields');
-        
-        setIsLoading(true);
-        setError('');
-        
-        try {
-            const { data } = await registerApi({ name, email, password });
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            onLogin(data.user);
-            navigate('/');
-        } catch (err) {
-            setError(err.response?.data?.error || err.response?.data?.message || 'Registration failed');
-        } finally {
-            setIsLoading(false);
-        }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onLogin();
+    };
+
+    const pageStyle = {
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0b141a',
+        fontFamily: 'sans-serif',
+        padding: '20px'
+    };
+
+    const cardStyle = {
+        width: '100%',
+        maxWidth: '420px',
+        backgroundColor: '#111b21',
+        borderRadius: '32px',
+        padding: '48px',
+        border: '1px solid rgba(255,255,255,0.05)',
+        textAlign: 'center',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+    };
+
+    const inputContainer = {
+        position: 'relative',
+        marginBottom: '20px'
+    };
+
+    const inputStyle = {
+        width: '100%',
+        backgroundColor: '#2a3942',
+        border: '1px solid transparent',
+        borderRadius: '16px',
+        padding: '16px 16px 16px 52px',
+        color: 'white',
+        fontSize: '15px',
+        outline: 'none',
+        transition: 'all 0.2s'
     };
 
     return (
-        <div className='min-h-screen bg-[#0b0b0b] flex flex-col items-center p-10'>
-            <div className='w-full max-w-sm flex flex-col items-center mt-12'>
-                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20 overflow-hidden'>
-                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+        <div style={pageStyle}>
+            <div style={cardStyle}>
+                <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: 'rgba(0,168,132,0.1)', borderRadius: '24px', marginBottom: '32px' }}>
+                    <ShieldCheck size={40} color="#00a884" />
                 </div>
 
-                <h1 className='text-3xl font-bold mb-2'>Create Account</h1>
-                <p className='text-gray-500 text-sm mb-12'>Join the AI revolution</p>
+                <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Join Us</h1>
+                <p style={{ color: '#8696a0', fontSize: '14px', marginBottom: '40px' }}>Create your account to start secure AI messaging</p>
 
-                {error && <div className='w-full p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-xs text-center'>{error}</div>}
-
-                <div className='w-full space-y-5'>
-                    <div className='relative group'>
-                        <User className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
+                <form onSubmit={handleSubmit}>
+                    <div style={inputContainer}>
+                        <User style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="text" 
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Full Name"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
+                            placeholder="Full name"
+                            required
+                            style={inputStyle}
+                            value={creds.name}
+                            onChange={(e) => setCreds({...creds, name: e.target.value})}
+                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
-                    <div className='relative group'>
-                        <Mail className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
+
+                    <div style={inputContainer}>
+                        <Mail style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
+                            placeholder="Email address"
+                            required
+                            style={inputStyle}
+                            value={creds.email}
+                            onChange={(e) => setCreds({...creds, email: e.target.value})}
+                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
-                    <div className='relative group'>
-                        <Lock className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
+
+                    <div style={inputContainer}>
+                        <Lock style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-14 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
+                            placeholder="Create password"
+                            required
+                            style={inputStyle}
+                            value={creds.password}
+                            onChange={(e) => setCreds({...creds, password: e.target.value})}
+                            onFocus={(e) => e.target.style.borderColor = '#00a884'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                         />
                     </div>
+
+                    <button 
+                        type="submit"
+                        style={{
+                            width: '100%',
+                            padding: '16px',
+                            backgroundColor: '#00a884',
+                            color: 'black',
+                            fontWeight: 'bold',
+                            borderRadius: '16px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            marginTop: '12px',
+                            transition: 'transform 0.2s'
+                        }}
+                    >
+                        Create Account
+                    </button>
+                </form>
+
+                <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
+                    <span style={{ fontSize: '12px', color: '#8696a0', fontWeight: 'bold', textTransform: 'uppercase' }}>or register with</span>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
                 </div>
 
-                <button 
-                    onClick={handleRegister}
-                    disabled={isLoading}
-                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl mt-10 transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50 disabled:scale-100'
-                >
-                    {isLoading ? 'Creating account...' : 'Sign Up'}
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '24px' }}>
+                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Globe size={20} color="#e9edef" /></div>
+                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Smartphone size={20} color="#e9edef" /></div>
+                    <div style={{ padding: '12px', backgroundColor: '#2a3942', borderRadius: '12px', cursor: 'pointer' }}><Github size={20} color="#e9edef" /></div>
+                </div>
 
-                <p className='mt-12 text-sm text-gray-500'>
-                    Already have an account? <button onClick={() => navigate('/login')} className='text-green-500 font-bold hover:underline'>Login</button>
+                <p style={{ marginTop: '40px', fontSize: '14px', color: '#8696a0' }}>
+                    Already have an account? <Link to="/login" style={{ color: '#00a884', textDecoration: 'none', fontWeight: 'bold' }}>Sign In</Link>
                 </p>
             </div>
         </div>

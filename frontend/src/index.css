@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
-  background-color: #050505;
-  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  --wa-bg: #0b141a;
+  --wa-sidebar: #111b21;
+  --wa-bubble-user: #005c4b;
+  --wa-bubble-bot: #202c33;
+  --wa-text: #e9edef;
+  --wa-active: #2a3942;
 }
 
 * {
@@ -13,38 +17,52 @@
 }
 
 body {
-  min-height: 100vh;
-  width: 100%;
+  background-color: var(--wa-bg);
+  color: var(--wa-text);
   overflow: hidden;
 }
 
-#root {
-  width: 100%;
-  height: 100vh;
+/* Messaging App Background Pattern */
+.chat-bg {
+  background-color: var(--wa-bg);
+  background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+  background-blend-mode: overlay;
+  opacity: 0.06;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-/* Custom Scrollbar for Chat */
-::-webkit-scrollbar {
-  width: 4px;
+/* Bubble Tail Effect */
+.bubble-user::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-left-color: var(--wa-bubble-user);
+  border-top-color: var(--wa-bubble-user);
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.bubble-bot::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-right-color: var(--wa-bubble-bot);
+  border-top-color: var(--wa-bubble-bot);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 197, 94, 0.3);
-}
-
-/* Glassmorphism Utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.neon-glow {
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
 }

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Sparkles, Paperclip, Mic, MoreVertical } from 'lucide-react'
+import { Send, MoreVertical, Search, Paperclip, Smile, Mic, CheckCheck, ArrowLeft } from 'lucide-react'
 
-const ChatContainer = ({ messages, onSendMessage, loading }) => {
+const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack }) => {
     const [input, setInput] = useState('');
     const scrollRef = useRef();
+    const messages = selectedUser?.messages || [];
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -18,91 +19,95 @@ const ChatContainer = ({ messages, onSendMessage, loading }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#050505] relative overflow-hidden">
-            {/* Background Accents */}
-            <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-green-500/5 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#0b141a', position: 'relative' }}>
+            {/* Doodle Background Layer */}
+            <div className="chat-bg" style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', backgroundBlendMode: 'overlay' }} />
 
             {/* Header */}
-            <header className="h-20 flex items-center justify-between px-8 border-b border-white/5 bg-black/20 backdrop-blur-xl z-10">
-                <div className="flex items-center gap-4">
-                    <div className="size-10 bg-gradient-to-tr from-green-500 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20">
-                        <Bot className="text-black" size={22} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold tracking-tight">Neural Core v1.0</h2>
-                        <div className="flex items-center gap-1.5">
-                            <div className="size-1.5 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Active Processing</span>
-                        </div>
+            <header style={{ height: '60px', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#202c33', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button onClick={onBack} style={{ display: 'none', border: 'none', background: 'none', color: '#aebac1' }}>
+                        <ArrowLeft size={24} />
+                    </button>
+                    <img src={selectedUser?.avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#111b21' }} alt="" />
+                    <div style={{ cursor: 'pointer' }}>
+                        <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#e9edef', margin: 0 }}>{selectedUser?.name}</h3>
+                        <p style={{ fontSize: '12px', color: '#8696a0', margin: 0 }}>online</p>
                     </div>
                 </div>
-                <button className="p-3 hover:bg-white/5 rounded-xl transition-all text-gray-500">
-                    <MoreVertical size={20} />
-                </button>
+                <div style={{ display: 'flex', gap: '24px', color: '#aebac1' }}>
+                    <Search size={20} style={{ cursor: 'pointer' }} />
+                    <MoreVertical size={20} style={{ cursor: 'pointer' }} />
+                </div>
             </header>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-6 py-10 space-y-8 custom-scrollbar">
+            {/* Message Area */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px 80px', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 5 }}>
                 {messages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                        <div className={`flex gap-4 max-w-[80%] ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                            <div className={`size-10 rounded-xl flex-shrink-0 flex items-center justify-center border ${msg.sender === 'user' ? 'bg-white/5 border-white/10' : 'bg-green-500/10 border-green-500/20'}`}>
-                                {msg.sender === 'user' ? <User size={18} className="text-gray-400" /> : <Sparkles size={18} className="text-green-500" />}
-                            </div>
-                            <div className={`p-5 rounded-3xl text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-white/5 border border-white/10 text-white rounded-tr-none' : 'bg-gradient-to-b from-[#111] to-[#0a0a0a] border border-white/5 text-gray-300 rounded-tl-none shadow-xl'}`}>
-                                {msg.text}
+                    <div key={i} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                        <div style={{
+                            position: 'relative',
+                            padding: '8px 12px 14px 12px',
+                            borderRadius: '8px',
+                            maxWidth: '65%',
+                            fontSize: '14.5px',
+                            boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)',
+                            backgroundColor: msg.sender === 'user' ? '#005c4b' : '#202c33',
+                            color: '#e9edef'
+                        }}>
+                            <p style={{ margin: 0, paddingRight: '48px', lineHeight: '1.5' }}>{msg.text}</p>
+                            <div style={{ position: 'absolute', bottom: '4px', right: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{msg.timestamp}</span>
+                                {msg.sender === 'user' && <CheckCheck size={14} color="#53bdeb" />}
                             </div>
                         </div>
                     </div>
                 ))}
                 {loading && (
-                    <div className="flex justify-start animate-pulse">
-                        <div className="flex gap-4 max-w-[80%]">
-                            <div className="size-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                                <Sparkles size={18} className="text-green-500" />
-                            </div>
-                            <div className="p-5 bg-white/5 border border-white/5 rounded-3xl rounded-tl-none flex gap-1.5">
-                                <div className="size-1.5 bg-green-500/40 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-                                <div className="size-1.5 bg-green-500/40 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                                <div className="size-1.5 bg-green-500/40 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
-                            </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <div style={{ padding: '12px 16px', borderRadius: '8px', backgroundColor: '#202c33', display: 'flex', gap: '4px' }}>
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%' }} />
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.2s' }} />
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.4s' }} />
                         </div>
                     </div>
                 )}
                 <div ref={scrollRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-8 bg-gradient-to-t from-black to-transparent z-10">
-                <form onSubmit={handleSend} className="max-w-4xl mx-auto relative group">
-                    <div className="absolute inset-0 bg-green-500/5 blur-2xl rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                    <div className="relative flex items-center bg-[#111] border border-white/10 rounded-[32px] p-2 pr-4 shadow-2xl transition-all focus-within:border-green-500/30">
-                        <button type="button" className="p-4 hover:bg-white/5 rounded-2xl transition-all text-gray-500">
-                            <Paperclip size={20} />
-                        </button>
-                        <input 
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type a command or message..."
-                            className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-white text-md placeholder:text-gray-600"
-                        />
-                        <button type="button" className="p-4 hover:bg-white/5 rounded-2xl transition-all text-gray-500 mr-2">
-                            <Mic size={20} />
-                        </button>
-                        <button 
-                            type="submit" 
-                            disabled={!input.trim() || loading}
-                            className="size-12 bg-green-500 hover:bg-green-400 disabled:bg-white/5 disabled:text-gray-600 text-black rounded-2xl flex items-center justify-center transition-all shadow-lg shadow-green-500/20 active:scale-95"
-                        >
-                            <Send size={20} />
-                        </button>
-                    </div>
+            {/* Input Footer */}
+            <footer style={{ padding: '8px 16px', backgroundColor: '#202c33', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 10 }}>
+                <div style={{ display: 'flex', gap: '16px', color: '#aebac1' }}>
+                    <Smile size={24} style={{ cursor: 'pointer' }} />
+                    <Paperclip size={24} style={{ cursor: 'pointer' }} />
+                </div>
+                <form onSubmit={handleSend} style={{ flex: 1 }}>
+                    <input 
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Type a message"
+                        style={{
+                            width: '100%',
+                            backgroundColor: '#2a3942',
+                            border: 'none',
+                            outline: 'none',
+                            padding: '10px 16px',
+                            borderRadius: '8px',
+                            color: '#d1d7db',
+                            fontSize: '15px'
+                        }}
+                    />
                 </form>
-                <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-6">
-                    Powered by Neural Core Engine • High Priority Protocol
-                </p>
-            </div>
+                <div style={{ color: '#aebac1' }}>
+                    {input.trim() ? (
+                        <button onClick={handleSend} style={{ border: 'none', background: 'none', color: '#00a884', padding: '4px', cursor: 'pointer' }}>
+                            <Send size={24} />
+                        </button>
+                    ) : (
+                        <Mic size={24} style={{ cursor: 'pointer' }} />
+                    )}
+                </div>
+            </footer>
         </div>
     )
 }

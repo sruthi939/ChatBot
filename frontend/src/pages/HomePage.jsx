@@ -15,6 +15,8 @@ const HomePage = ({ onLogout }) => {
     const [selectedUser, setSelectedUser] = useState(null)
     const [notification, setNotification] = useState(null)
     const [showBanner, setShowBanner] = useState(true)
+    const [messages, setMessages] = useState([])
+    const [loading, setLoading] = useState(false)
     const location = useLocation()
 
     React.useEffect(() => {
@@ -29,51 +31,83 @@ const HomePage = ({ onLogout }) => {
         fetchNotify();
     }, []);
 
-    // Determine what to show in the main area
-    const renderMainContent = () => {
-        if (selectedUser) {
-            return <ChatContainer selectedUser={selectedUser} onBack={() => setSelectedUser(null)} />
-        }
+    const handleSendMessage = async (text) => {
+        const userMsg = { id: Date.now(), sender: 'user', text, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+        setMessages(prev => [...prev, userMsg]);
+        setLoading(true);
+        
+        // Mock AI Response
+        setTimeout(() => {
+            const aiMsg = { id: Date.now() + 1, sender: 'bot', text: `As your AI Assistant, I've received your message: "${text}". How else can I assist you?`, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+            setMessages(prev => [...prev, aiMsg]);
+            setLoading(false);
+        }, 1500);
+    };
 
-        switch (location.pathname) {
-            case '/profile':
-                return <Profile onLogout={onLogout} />
-            case '/new-chat':
-                return <NewChatList onSelect={(text) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'user', text: text, timestamp: 'Just now' }] })} />
-            case '/history':
-                return <History />
-            case '/bookmarks':
-                return <Bookmarks />
-            case '/settings':
-                return <Settings onLogout={onLogout} />
-            default:
-                return <Dashboard 
-                    onNewChat={(title) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'bot', text: `How can I help you with ${title}?`, timestamp: 'Just now' }] })} 
-                    onSelectChat={setSelectedUser}
-                />
-        }
-    }
+    const containerStyle = {
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#0b141a',
+        overflow: 'hidden',
+        fontFamily: 'sans-serif'
+    };
+
+    const mainAreaStyle = {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative'
+    };
 
     return (
-        <div className='flex h-screen bg-[#0b0b0b] overflow-hidden'>
-            <Sidebar selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
-            <div className='flex-1 flex flex-col relative'>
+        <div style={containerStyle}>
+            <Sidebar 
+                selectedUser={selectedUser} 
+                setSelectedUser={(u) => {
+                    setSelectedUser(u);
+                    setMessages([
+                        { id: 1, sender: 'bot', text: `Hello! I am ${u.name}. How can I help you today?`, timestamp: '10:00 AM' }
+                    ]);
+                }} 
+            />
+            
+            <div style={mainAreaStyle}>
                 {notification && showBanner && (
-                    <div className='bg-red-500/10 border-b border-red-500/20 p-3 flex items-center justify-between animate-in slide-in-from-top duration-500'>
-                        <div className='flex items-center gap-3 px-4'>
-                            <Megaphone className='size-4 text-red-500' />
-                            <p className='text-xs font-bold text-red-500 tracking-wide'>{notification.message}</p>
+                    <div style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderBottom: '1px solid rgba(239,68,68,0.2)', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 20 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Megaphone size={16} color="#ef4444" />
+                            <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#ef4444', margin: 0 }}>{notification.message}</p>
                         </div>
-                        <button onClick={() => setShowBanner(false)} className='p-1 hover:bg-red-500/20 rounded-lg transition-all'>
-                            <X className='size-4 text-red-500' />
-                        </button>
+                        <X size={16} color="#ef4444" style={{ cursor: 'pointer' }} onClick={() => setShowBanner(false)} />
                     </div>
                 )}
-                {renderMainContent()}
+
+                {selectedUser ? (
+                    <ChatContainer 
+                        selectedUser={{...selectedUser, messages}} 
+                        onSendMessage={handleSendMessage} 
+                        loading={loading}
+                        onBack={() => setSelectedUser(null)} 
+                    />
+                ) : (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#8696a0', padding: '40px' }}>
+                        <div style={{ padding: '40px', backgroundColor: '#111b21', borderRadius: '50%', marginBottom: '32px' }}>
+                            <img src="https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png" style={{ width: '120px', opacity: 0.1, filter: 'invert(1)' }} alt="" />
+                        </div>
+                        <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: '300', marginBottom: '16px' }}>ChatBot Web</h1>
+                        <p style={{ maxWidth: '450px', lineHeight: '1.6', fontSize: '14px' }}>
+                            Send and receive messages with your AI Core. <br /> 
+                            All conversations are end-to-end encrypted and secure.
+                        </p>
+                        <div style={{ marginTop: 'auto', borderTop: '1px solid #262626', width: '100%', paddingTop: '20px', fontSize: '12px' }}>
+                            Neural Core v1.0 • Stable Connection
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 
 export default HomePage
-

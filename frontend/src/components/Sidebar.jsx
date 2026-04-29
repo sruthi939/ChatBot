@@ -1,141 +1,100 @@
 import React from 'react'
-import { Home, SquarePlus, Clock, Bookmark, Settings, Crown, MoreVertical, MessageSquare } from 'lucide-react'
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, NavigationItems } from '../lib/data';
-import { assets } from '../assets/assets';
+import { Search, MoreVertical, MessageSquarePlus, Filter, CheckCheck } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
     const navigate = useNavigate();
-    const location = useLocation();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    const recentChats = [
+        { id: 'ai', name: 'Neural Core AI', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', lastMsg: 'I am ready for your commands.', time: '12:45 PM', unread: 1, online: true },
+        { id: 'support', name: 'System Security', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Support', lastMsg: 'Access granted successfully.', time: 'Yesterday', unread: 0, online: false },
+        { id: 'dev', name: 'Global Engine', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dev', lastMsg: 'Optimization complete.', time: 'Monday', unread: 0, online: true }
+    ];
+
+    const sidebarStyle = {
+        width: '380px',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#111b21',
+        borderRight: '1px solid rgba(255,255,255,0.05)',
+        zIndex: 50
+    };
 
     return (
-        <div className={`w-[280px] h-full flex flex-col bg-[#0b0b0b] border-r border-[#1a1a1a] text-white transition-all duration-300 ${selectedUser ? "max-md:hidden" : ""}`}>
-            {/* Header / Logo */}
-            <div className='p-6 flex items-center gap-3'>
-                <div className='w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center overflow-hidden'>
-                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+        <div style={sidebarStyle}>
+            {/* Header */}
+            <div style={{ height: '60px', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#202c33' }}>
+                <div onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+                    <img 
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'User'}`} 
+                        style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#111b21' }} 
+                        alt="Profile" 
+                    />
                 </div>
-                <div>
-                    <h2 className='text-lg font-bold tracking-tight'>ChatBot AI</h2>
-                    <div className='flex items-center gap-1.5'>
-                        <div className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
-                        <span className='text-[10px] text-green-500 font-medium'>Online</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation Menu */}
-            <div className='px-4 mb-8'>
-                <div className='flex flex-col gap-1'>
-                    {NavigationItems.map((item) => {
-                        const Icon = { Home, SquarePlus, Clock, Bookmark, Settings }[item.icon];
-                        const isActive = location.pathname === `/${item.id}` || (item.id === 'home' && location.pathname === '/');
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => navigate(item.id === 'home' ? '/' : `/${item.id}`)}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                    ${isActive
-                                        ? "bg-green-500/10 text-green-500"
-                                        : "text-gray-500 hover:bg-[#1a1a1a] hover:text-white"}`}
-                            >
-                                <Icon className={`size-5 ${isActive ? "text-green-500" : "text-gray-500 group-hover:text-white"}`} />
-                                <span className='text-sm font-medium'>{item.label}</span>
-                            </button>
-                        );
-                    })}
+                <div style={{ display: 'flex', gap: '24px', color: '#aebac1' }}>
+                    <MessageSquarePlus size={20} style={{ cursor: 'pointer' }} />
+                    <MoreVertical size={20} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
 
-            {/* Recent Chats Section */}
-            <div className='px-4 flex-1 flex flex-col min-h-0'>
-                <div className='px-4 mb-4 flex justify-between items-center'>
-                    <span className='text-[10px] font-bold text-gray-600 uppercase tracking-widest'>Recent Chats</span>
+            {/* Search */}
+            <div style={{ padding: '8px', backgroundColor: '#111b21' }}>
+                <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#202c33', borderRadius: '12px', padding: '0 12px' }}>
+                    <Search size={18} color="#8696a0" />
+                    <input 
+                        type="text" 
+                        placeholder="Search chats..." 
+                        style={{ width: '100%', backgroundColor: 'transparent', border: 'none', outline: 'none', padding: '10px', color: '#d1d7db', fontSize: '14px' }}
+                    />
                 </div>
-                <div className='flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1 pr-1'>
-                    {Users.map((user) => (
-                        <div
-                            key={user.id}
-                            onClick={() => setSelectedUser(user)}
-                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 group
-                                ${user.id === selectedUser?.id
-                                    ? "bg-[#1a1a1a] border border-[#262626]"
-                                    : "hover:bg-[#1a1a1a] border border-transparent"}`}
-                        >
-                            <div className='relative flex-shrink-0'>
-                                <img
-                                    src={user.avatar}
-                                    alt={user.name}
-                                    className='size-10 rounded-lg bg-[#1a1a1a]'
-                                />
-                                {user.status === 'online' && (
-                                    <span className='absolute -bottom-0.5 -right-0.5 size-2.5 bg-green-500 border-2 border-[#0b0b0b] rounded-full' />
+            </div>
+
+            {/* List */}
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+                {recentChats.map((chat) => (
+                    <div 
+                        key={chat.id}
+                        onClick={() => setSelectedUser(chat)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '12px 16px',
+                            cursor: 'pointer',
+                            backgroundColor: selectedUser?.id === chat.id ? '#2a3942' : 'transparent',
+                            transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = selectedUser?.id === chat.id ? '#2a3942' : '#202c33'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedUser?.id === chat.id ? '#2a3942' : 'transparent'}
+                    >
+                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                            <img src={chat.avatar} style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#202c33' }} alt="" />
+                            {chat.online && <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '10px', height: '10px', backgroundColor: '#00a884', borderRadius: '50%', border: '2px solid #111b21' }} />}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0, paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '500', color: '#e9edef', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.name}</h4>
+                                <span style={{ fontSize: '12px', color: chat.unread > 0 ? '#00a884' : '#8696a0', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center', overflow: 'hidden' }}>
+                                    <CheckCheck size={16} color="#53bdeb" style={{ flexShrink: 0 }} />
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#8696a0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.lastMsg}</p>
+                                </div>
+                                {chat.unread > 0 && (
+                                    <div style={{ minWidth: '20px', height: '20px', backgroundColor: '#00a884', color: 'black', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', padding: '0 6px' }}>
+                                        {chat.unread}
+                                    </div>
                                 )}
                             </div>
-                            <div className='flex-1 min-w-0'>
-                                <div className='flex justify-between items-center mb-0.5'>
-                                    <h3 className='font-semibold text-[13px] truncate'>{user.lastMessage}</h3>
-                                </div>
-                                <div className='flex justify-between items-center'>
-                                    <span className='text-[10px] text-gray-500'>{user.timestamp}</span>
-                                    {user.unreadCount > 0 && (
-                                        <span className='bg-green-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded-md'>
-                                            {user.unreadCount}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Bottom Section */}
-            <div className='p-4 space-y-4'>
-                {/* Upgrade Pro Card */}
-                <div 
-                    onClick={() => alert('Pro features coming soon!')}
-                    className='bg-gradient-to-br from-[#1a1a1a] to-[#0b0b0b] border border-[#262626] rounded-2xl p-4 relative overflow-hidden group cursor-pointer active:scale-95 transition-all'
-                >
-                    <div className='absolute -right-4 -top-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-xl group-hover:bg-yellow-500/20 transition-all' />
-                    <div className='relative z-10 flex flex-col gap-3'>
-                        <div className='flex items-center gap-2'>
-                            <div className='p-1.5 bg-yellow-500/20 rounded-lg'>
-                                <Crown className='size-3 text-yellow-500' />
-                            </div>
-                            <span className='text-xs font-bold'>Upgrade to Pro</span>
-                        </div>
-                        <p className='text-[10px] text-gray-500 leading-relaxed'>Unlock more features and unlimited access.</p>
                     </div>
-                </div>
-
-                {/* User Profile */}
-                <div 
-                    onClick={() => navigate('/profile')}
-                    className='flex items-center gap-3 p-3 bg-[#1a1a1a]/50 rounded-2xl border border-[#262626]/50 cursor-pointer hover:bg-[#1a1a1a] transition-all active:scale-95'
-                >
-                    <img 
-                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${JSON.parse(localStorage.getItem('user') || '{}').name || 'User'}`} 
-                        alt="User" 
-                        className='size-10 rounded-xl bg-[#1a1a1a]' 
-                    />
-                    <div className='flex-1 min-w-0'>
-                        <h4 className='text-sm font-bold truncate'>
-                            {JSON.parse(localStorage.getItem('user') || '{}').name || 'User Account'}
-                        </h4>
-                        <p className='text-[10px] text-gray-500 truncate'>
-                            {JSON.parse(localStorage.getItem('user') || '{}').email || 'No email set'}
-                        </p>
-                    </div>
-                    <button className='p-1.5 hover:bg-[#262626] rounded-lg transition-colors'>
-                        <MoreVertical className='size-4 text-gray-500' />
-                    </button>
-                </div>
+                ))}
             </div>
         </div>
     )
 }
 
 export default Sidebar
-
-
