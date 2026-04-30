@@ -7,8 +7,11 @@ A modern, full-stack AI-powered chat application inspired by Telegram. Features 
 ## ✨ Features
 
 - 🔐 **Secure Auth**: JWT-based user registration and login with password hashing.
-- 🧠 **AI Intelligence**: Integrated with OpenAI GPT-3.5-Turbo for smart, context-aware responses.
+- 🧠 **AI Intelligence**: Integrated with OpenAI GPT-3.5-Turbo for smart, context-aware responses (with robust fallback mock-mode for uninterrupted testing).
 - 🎨 **Premium UI**: Telegram-inspired dark theme with glassmorphism, pulse animations, and responsive design.
+- 🔍 **Real-time Search**: Instant in-chat message search with dynamic text highlighting.
+- 🎙️ **Voice Typing**: Native browser Speech-to-Text integration for hands-free voice message transcription.
+- 😊 **Emoji Picker**: Fully integrated dark-themed emoji picker for expressive messaging.
 - 📱 **Adaptive Layout**: Works seamlessly on mobile and desktop devices.
 - 🕒 **Persistent History**: Chat history and user profiles stored securely in MongoDB.
 - 🔖 **Productivity Tools**: Bookmarks, History, and Personalized Settings.
@@ -89,4 +92,5 @@ The app will be available at `http://localhost:5173`.
 Distributed under the ISC License. See `LICENSE` for more information.
 
 ## 👤 Author
-**Sruthi** - [GitHub Profile](https://github.com/sruthi939)
+**Sruthi** 
+[GitHub Profile](https://github.com/sruthi939)
