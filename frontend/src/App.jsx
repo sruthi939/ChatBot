@@ -1,62 +1,72 @@
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import LandingPage from './pages/LandingPage'
+import { login as loginAPI, register as registerAPI } from './lib/api'
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(localStorage.getItem('hasSeenOnboarding') === 'true')
+  const [error, setError] = useState('')
 
-  // In a real app, check localStorage/session here
-  useEffect(() => {
-    const onboarding = localStorage.getItem('hasSeenOnboarding')
-    const auth = localStorage.getItem('isLoggedIn')
-    if (onboarding) setHasSeenOnboarding(true)
-    if (auth) setIsLoggedIn(true)
-  }, [])
+  const handleLogin = async (creds) => {
+    try {
+      setError('');
+      const { data } = await loginAPI(creds);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Authentication failed');
+    }
+  };
 
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('hasSeenOnboarding', 'true')
-    setHasSeenOnboarding(true)
-  }
-
-  const handleLogin = () => {
-    localStorage.setItem('isLoggedIn', 'true')
-    setIsLoggedIn(true)
-  }
+  const handleRegister = async (userData) => {
+    try {
+      setError('');
+      const { data } = await registerAPI(userData);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn')
-    setIsLoggedIn(false)
-  }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('hasSeenOnboarding', 'true');
+    setHasSeenOnboarding(true);
+  };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b]">
+    <div className="min-h-screen bg-[#0b141a]">
       <Routes>
         <Route 
           path="/" 
           element={
             !hasSeenOnboarding ? (
               <LandingPage onComplete={handleOnboardingComplete} />
-            ) : !isLoggedIn ? (
+            ) : !user ? (
               <Navigate to="/login" />
             ) : (
               <HomePage onLogout={handleLogout} />
             )
           } 
         />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/signup" element={<Register onLogin={handleLogin} />} />
+        <Route path="/login" element={!user ? <Login onLogin={handleLogin} error={error} /> : <Navigate to="/" />} />
+        <Route path="/signup" element={!user ? <Register onRegister={handleRegister} error={error} /> : <Navigate to="/" />} />
         
         {/* Protected routes */}
-        <Route path="/home" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/new-chat" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/history" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/bookmarks" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/settings" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/home" element={user ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/profile" element={user ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
         
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" />} />

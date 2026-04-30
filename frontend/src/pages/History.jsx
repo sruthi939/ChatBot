@@ -18,7 +18,7 @@ const History = () => {
                     </div>
                     <h1 className='text-2xl font-bold'>History</h1>
                 </div>
-                <button className='p-3 bg-[#171717] rounded-2xl border border-[#262626]'>
+                <button className='p-3 bg-[#171717] rounded-2xl border border-[#262626] hover:border-gray-600 transition-all cursor-pointer active:scale-95'>
                     <Search className='size-5 text-gray-500' />
                 </button>
             </header>
@@ -55,7 +55,7 @@ const History = () => {
                                     <h4 className='text-sm font-bold'>{chat.lastMessage}</h4>
                                     <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp} • {chat.name}</p>
                                 </div>
-                                <button className='p-2 hover:bg-[#262626] rounded-xl'>
+                                <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors cursor-pointer active:scale-95'>
                                     <MoreVertical className='size-5 text-gray-500' />
                                 </button>
                             </div>
@@ -79,7 +79,7 @@ const History = () => {
                                     <h4 className='text-sm font-bold'>{chat.lastMessage}</h4>
                                     <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp} • {chat.name}</p>
                                 </div>
-                                <button className='p-2 hover:bg-[#262626] rounded-xl'>
+                                <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors cursor-pointer active:scale-95'>
                                     <MoreVertical className='size-5 text-gray-500' />
                                 </button>
                             </div>

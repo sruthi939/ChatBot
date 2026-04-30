@@ -68,11 +68,11 @@ const OnboardingScreen = ({ onStart }) => {
                 </div>
                 <button 
                     onClick={onStart}
-                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl transition-all shadow-lg shadow-green-500/20 active:scale-95'
+                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl transition-all shadow-lg shadow-green-500/20 active:scale-95 cursor-pointer'
                 >
                     Get Started
                 </button>
-                <button className='w-full text-gray-500 font-bold py-2 hover:text-white transition-colors'>
+                <button className='w-full text-gray-500 font-bold py-2 hover:text-white transition-colors cursor-pointer active:scale-95'>
                     Skip
                 </button>
             </div>

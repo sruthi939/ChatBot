@@ -1,79 +1,125 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import ChatContainer from '../components/ChatContainer'
-import Dashboard from './Dashboard'
-import Profile from './Profile'
-import NewChatList from './NewChatList'
-import History from './History'
-import Bookmarks from './Bookmarks'
-import Settings from './Settings'
-import { useLocation } from 'react-router-dom'
-import { getLatestNotification } from '../lib/api'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { getLatestNotification, getChatHistory, sendMessage as sendAPIMessage } from '../lib/api'
 import { Megaphone, X } from 'lucide-react'
 
 const HomePage = ({ onLogout }) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const navigate = useNavigate();
     const [selectedUser, setSelectedUser] = useState(null)
     const [notification, setNotification] = useState(null)
     const [showBanner, setShowBanner] = useState(true)
-    const location = useLocation()
+    const [messages, setMessages] = useState([])
+    const [loading, setLoading] = useState(false)
 
-    React.useEffect(() => {
-        const fetchNotify = async () => {
+    // Load History
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            if (!user.id) return;
             try {
-                const { data } = await getLatestNotification();
-                if (data) setNotification(data);
+                const [notifyRes, historyRes] = await Promise.all([
+                    getLatestNotification(),
+                    getChatHistory(user.id)
+                ]);
+                if (notifyRes.data) setNotification(notifyRes.data);
+                if (historyRes.data) {
+                    setMessages(historyRes.data);
+                    setSelectedUser({
+                        id: 'ai',
+                        name: 'Neural Core AI',
+                        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1'
+                    });
+                }
             } catch (err) {
-                console.error(err);
+                console.error('INIT_FETCH_ERROR:', err);
             }
         };
-        fetchNotify();
+        fetchInitialData();
     }, []);
 
-    // Determine what to show in the main area
-    const renderMainContent = () => {
-        if (selectedUser) {
-            return <ChatContainer selectedUser={selectedUser} onBack={() => setSelectedUser(null)} />
-        }
+    const handleSendMessage = async (text) => {
+        if (!user.id) return;
 
-        switch (location.pathname) {
-            case '/profile':
-                return <Profile onLogout={onLogout} />
-            case '/new-chat':
-                return <NewChatList onSelect={(text) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'user', text: text, timestamp: 'Just now' }] })} />
-            case '/history':
-                return <History />
-            case '/bookmarks':
-                return <Bookmarks />
-            case '/settings':
-                return <Settings onLogout={onLogout} />
-            default:
-                return <Dashboard 
-                    onNewChat={(title) => setSelectedUser({ name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1', messages: [{ id: 1, sender: 'bot', text: `How can I help you with ${title}?`, timestamp: 'Just now' }] })} 
-                    onSelectChat={setSelectedUser}
-                />
+        const optimisticUserMsg = { id: Date.now(), sender: 'user', text, timestamp: new Date().toISOString() };
+        setMessages(prev => [...prev, optimisticUserMsg]);
+        setLoading(true);
+
+        try {
+            const { data } = await sendAPIMessage({ userId: user.id, text, persona: 'Architect' });
+            setMessages(prev => {
+                const filtered = prev.filter(m => m.id !== optimisticUserMsg.id);
+                return [...filtered, data.userMsg, data.botMsg];
+            });
+        } catch (err) {
+            const errorMsg = err.response?.data?.error || 'AI Connection Failed';
+            alert(`SYSTEM_ERROR: ${errorMsg}`);
+            setMessages(prev => prev.filter(m => m.id !== optimisticUserMsg.id));
+        } finally {
+            setLoading(false);
         }
-    }
+    };
+
+    const handleClearChat = () => {
+        if (window.confirm('Are you sure you want to clear your message history? This action is permanent.')) {
+            setMessages([]);
+            alert('History cleared in current view.');
+        }
+    };
+
+    const containerStyle = {
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#0b141a',
+        overflow: 'hidden',
+        fontFamily: 'sans-serif'
+    };
 
     return (
-        <div className='flex h-screen bg-[#0b0b0b] overflow-hidden'>
-            <Sidebar selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
-            <div className='flex-1 flex flex-col relative'>
+        <div style={containerStyle}>
+            <Sidebar 
+                selectedUser={selectedUser} 
+                setSelectedUser={setSelectedUser} 
+                lastMessage={messages[messages.length - 1]}
+                onNewChat={() => setSelectedUser({ id: 'ai', name: 'Neural Core AI', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1' })}
+                onLogout={onLogout}
+            />
+            
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 {notification && showBanner && (
-                    <div className='bg-red-500/10 border-b border-red-500/20 p-3 flex items-center justify-between animate-in slide-in-from-top duration-500'>
-                        <div className='flex items-center gap-3 px-4'>
-                            <Megaphone className='size-4 text-red-500' />
-                            <p className='text-xs font-bold text-red-500 tracking-wide'>{notification.message}</p>
+                    <div style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderBottom: '1px solid rgba(239,68,68,0.2)', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 20 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Megaphone size={16} color="#ef4444" />
+                            <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#ef4444', margin: 0 }}>{notification.message}</p>
                         </div>
-                        <button onClick={() => setShowBanner(false)} className='p-1 hover:bg-red-500/20 rounded-lg transition-all'>
-                            <X className='size-4 text-red-500' />
-                        </button>
+                        <X size={16} color="#ef4444" style={{ cursor: 'pointer' }} onClick={() => setShowBanner(false)} />
                     </div>
                 )}
-                {renderMainContent()}
+
+                {selectedUser ? (
+                    <ChatContainer 
+                        selectedUser={{...selectedUser, messages}} 
+                        onSendMessage={handleSendMessage} 
+                        loading={loading}
+                        onBack={() => setSelectedUser(null)}
+                        onClearChat={handleClearChat}
+                    />
+                ) : (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#8696a0', padding: '40px' }}>
+                        <div style={{ padding: '40px', backgroundColor: '#111b21', borderRadius: '50%', marginBottom: '32px' }}>
+                            <img src="https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png" style={{ width: '120px', opacity: 0.1, filter: 'invert(1)' }} alt="" />
+                        </div>
+                        <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: '300', marginBottom: '16px' }}>Neural Core Chat</h1>
+                        <p style={{ maxWidth: '450px', lineHeight: '1.6', fontSize: '14px' }}>
+                            Encrypted AI Messaging Protocol • Stable Connection Established
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 
 export default HomePage
-

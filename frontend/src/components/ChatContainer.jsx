@@ -1,304 +1,250 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { MoreVertical, Paperclip, Send, User, ChevronLeft, Copy, Check } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { sendMessage as sendMessageApi, sendGroupMessage as sendGroupMessageApi, getChatHistory, generateImage as generateImageApi, analyzeFile as analyzeFileApi, addBookmark as addBookmarkApi } from '../lib/api'
-import { Image, Sparkles, Bookmark } from 'lucide-react'
+import React, { useState, useRef, useEffect } from 'react'
+import { Send, MoreVertical, Search, Paperclip, Smile, Mic, CheckCheck, ArrowLeft, Trash2, FileText, X } from 'lucide-react'
+import { analyzeFile } from '../lib/api'
+import EmojiPicker from 'emoji-picker-react'
 
-const ChatContainer = ({ selectedUser, onBack }) => {
-    const [messages, setMessages] = useState([]);
-    const [inputText, setInputText] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const [persona, setPersona] = useState('Architect');
-    const [isGroupMode, setIsGroupMode] = useState(false);
-    const [copiedId, setCopiedId] = useState(null);
-    const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
-    const messagesEndRef = useRef(null);
+const ChatContainer = ({ selectedUser, onSendMessage, loading, onBack, onClearChat }) => {
+    const [input, setInput] = useState('');
+    const [showMenu, setShowMenu] = useState(false);
+    
+    // Search feature state
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    
+    // Emoji picker state
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    
+    // Voice recording state
+    const [isRecording, setIsRecording] = useState(false);
+    const [recognition, setRecognition] = useState(null);
 
-    const personas = ['Architect', 'Creative', 'Analyst', 'Coach'];
+    const scrollRef = useRef();
+    const fileInputRef = useRef();
+    const messages = selectedUser?.messages || [];
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    useEffect(() => {
+        // Initialize SpeechRecognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recog = new SpeechRecognition();
+            recog.continuous = false;
+            recog.interimResults = true;
+            recog.lang = 'en-US';
+
+            recog.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('');
+                
+                setInput(transcript);
+            };
+
+            recog.onend = () => {
+                setIsRecording(false);
+            };
+
+            setRecognition(recog);
+        }
+    }, []);
+
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isSearching]);
+
+    const formatTime = (timestamp) => {
+        if (!timestamp) return '';
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, isTyping]);
-
-    useEffect(() => {
-        const fetchHistory = async () => {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user && selectedUser?.id === 1) { // Assuming id:1 is the main AI assistant for now
-                try {
-                    const { data } = await getChatHistory(user.id);
-                    if (data.length > 0) setMessages(data);
-                    else setMessages(selectedUser?.messages || []);
-                } catch (err) {
-                    setMessages(selectedUser?.messages || []);
-                }
-            } else {
-                setMessages(selectedUser?.messages || []);
-            }
-        };
-        fetchHistory();
-    }, [selectedUser]);
-
-     const handleSendMessage = async () => {
-        if (!inputText.trim()) return;
-
-        const user = JSON.parse(localStorage.getItem('user'));
-        const userMsg = {
-            id: Date.now(),
-            sender: 'user',
-            text: inputText,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-
-        setMessages(prev => [...prev, userMsg]);
-        setInputText('');
-        setIsTyping(true);
-
-        try {
-            if (isGroupMode) {
-                const { data } = await sendGroupMessageApi({ userId: user.id, text: inputText });
-                const newBotMsgs = data.botMessages.map(m => ({
-                    ...m,
-                    timestamp: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                }));
-                setMessages(prev => [...prev, ...newBotMsgs]);
-            } else if (inputText.startsWith('/image ')) {
-                const prompt = inputText.replace('/image ', '');
-                const { data } = await generateImageApi({ userId: user.id, prompt });
-                setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
-            } else {
-                const { data } = await sendMessageApi({ userId: user.id, text: inputText, persona });
-                setMessages(prev => [...prev, { ...data.botMsg, timestamp: new Date(data.botMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
-            }
-        } catch (err) {
-            const errorMsg = {
-                id: Date.now() + 1,
-                sender: 'bot',
-                text: "I'm sorry, I'm having trouble connecting to my brain right now. Please check your API key in the backend .env file.",
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            setMessages(prev => [...prev, errorMsg]);
-        } finally {
-            setIsTyping(false);
+    const handleSend = (e) => {
+        e?.preventDefault();
+        if (input.trim() && !loading) {
+            onSendMessage(input);
+            setInput('');
+            setShowEmojiPicker(false);
         }
     };
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        setIsTyping(true);
-        const user = JSON.parse(localStorage.getItem('user'));
-        const userMsg = {
-            id: Date.now(),
-            sender: 'user',
-            text: `📁 Uploaded file: **${file.name}**\n*Analyzing content...*`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        setMessages(prev => [...prev, userMsg]);
-
+        
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('prompt', "Please summarize this document.");
+        formData.append('userId', JSON.parse(localStorage.getItem('user')).id);
 
+        alert(`Uploading ${file.name} for analysis...`);
         try {
-            const { data } = await analyzeFileApi(formData);
-            const botMsg = {
-                id: Date.now() + 1,
-                sender: 'bot',
-                text: `### Document Summary: ${data.fileName}\n\n${data.analysis}`,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            setMessages(prev => [...prev, botMsg]);
+            const { data } = await analyzeFile(formData);
+            onSendMessage(`Analyzing file: ${file.name}. \n\nSummary: ${data.analysis}`);
         } catch (err) {
-            alert('Failed to analyze document');
-        } finally {
-            setIsTyping(false);
+            alert('File analysis failed. Ensure the backend file service is active.');
         }
     };
 
-    const copyToClipboard = (text, id) => {
-        navigator.clipboard.writeText(text);
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 2000);
-    };
+    const handleMicClick = () => {
+        if (!recognition) {
+            alert('Voice recording is not supported in this browser.');
+            return;
+        }
 
-    const handleBookmark = async (msg) => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        try {
-            await addBookmarkApi({ 
-                userId: user.id, 
-                title: msg.text.substring(0, 40) + '...', 
-                text: msg.text 
-            });
-            setBookmarkedIds(prev => new Set([...prev, msg.id]));
-        } catch (err) {
-            alert('Failed to save bookmark');
+        if (isRecording) {
+            recognition.stop();
+            setIsRecording(false);
+        } else {
+            setInput('');
+            recognition.start();
+            setIsRecording(true);
         }
     };
 
-    const clearChat = () => {
-        if (window.confirm('Are you sure you want to clear this conversation?')) {
-            setMessages([]);
-        }
+    const onEmojiClick = (emojiObject) => {
+        setInput(prev => prev + emojiObject.emoji);
     };
+
+    const filteredMessages = isSearching && searchQuery.trim() 
+        ? messages.filter(m => m.text.toLowerCase().includes(searchQuery.toLowerCase()))
+        : messages;
 
     return (
-        <div className='flex-1 flex flex-col bg-[#0b0b0b] relative h-full'>
-            {/* Chat Header */}
-            <div className='p-6 border-b border-[#1a1a1a] flex justify-between items-center bg-[#0b0b0b]/80 backdrop-blur-xl sticky top-0 z-10'>
-                <div className='flex items-center gap-4'>
-                    <button onClick={onBack} className='md:hidden p-2 hover:bg-[#1a1a1a] rounded-xl transition-colors'>
-                        <ChevronLeft className='size-6 text-gray-500' />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#0b141a', position: 'relative' }}>
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', backgroundBlendMode: 'overlay', pointerEvents: 'none' }} />
+
+            {/* Header */}
+            <header style={{ height: '60px', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#202c33', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                    <button onClick={onBack} className="md:hidden border-none bg-transparent text-[#aebac1] hover:text-white transition-colors cursor-pointer">
+                        <ArrowLeft size={24} />
                     </button>
-                    <div className='w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center border border-green-500/20'>
-                        {selectedUser?.avatar ? (
-                            <img src={selectedUser.avatar} className='size-10 rounded-xl' alt="Avatar" />
-                        ) : (
-                            <User className='text-green-500 size-6' />
+                    
+                    {!isSearching ? (
+                        <>
+                            <img src={selectedUser?.avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#111b21' }} alt="" />
+                            <div>
+                                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#e9edef', margin: 0 }}>{selectedUser?.name}</h3>
+                                <p style={{ fontSize: '12px', color: '#00a884', margin: 0 }}>active session</p>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex-1 flex items-center bg-[#2a3942] rounded-xl px-3 py-1 mr-4 transition-all">
+                            <input 
+                                autoFocus
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search messages..."
+                                className="bg-transparent border-none outline-none text-[#d1d7db] text-sm w-full py-1"
+                            />
+                            <X size={18} className="text-[#aebac1] cursor-pointer hover:text-white ml-2" onClick={() => { setIsSearching(false); setSearchQuery(''); }} />
+                        </div>
+                    )}
+                </div>
+                <div style={{ display: 'flex', gap: '24px', color: '#aebac1', position: 'relative' }}>
+                    {!isSearching && <Search size={20} style={{ cursor: 'pointer' }} onClick={() => setIsSearching(true)} className="hover:text-white transition-colors" />}
+                    <div style={{ position: 'relative' }}>
+                        <MoreVertical size={20} style={{ cursor: 'pointer' }} onClick={() => setShowMenu(!showMenu)} className="hover:text-white transition-colors" />
+                        {showMenu && (
+                            <div style={{ position: 'absolute', top: '30px', right: 0, width: '180px', backgroundColor: '#233138', borderRadius: '8px', padding: '8px 0', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', zIndex: 50 }}>
+                                <div onClick={() => { onClearChat(); setShowMenu(false); }} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', color: '#e9edef', fontSize: '14px' }} className="hover:bg-[#111b21] transition-colors">
+                                    <Trash2 size={16} color="#ef4444" /> Clear Chat
+                                </div>
+                            </div>
                         )}
                     </div>
-                     <div>
-                        <h2 className='text-lg font-bold'>{selectedUser?.name || 'ChatBot AI'}</h2>
-                        <select 
-                            value={persona}
-                            onChange={(e) => setPersona(e.target.value)}
-                            className='bg-transparent text-[10px] text-green-500 font-bold uppercase tracking-wider outline-none cursor-pointer hover:text-green-400'
-                        >
-                             {personas.map(p => <option key={p} value={p} className='bg-[#0b0b0b] text-white'>{p} Mode</option>)}
-                        </select>
-                    </div>
                 </div>
-                
-                <div className='flex items-center gap-4'>
-                    <button 
-                        onClick={() => setIsGroupMode(!isGroupMode)}
-                        className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-[10px] font-bold uppercase tracking-wider
-                            ${isGroupMode 
-                                ? 'bg-violet-500/10 border-violet-500/50 text-violet-500' 
-                                : 'bg-[#171717] border-[#262626] text-gray-500 hover:border-gray-600'}`}
-                    >
-                        <div className={`size-2 rounded-full ${isGroupMode ? 'bg-violet-500 animate-pulse' : 'bg-gray-600'}`} />
-                        Group Brainstorming
-                    </button>
+            </header>
 
-                    <button 
-                        onClick={onBack}
-                        className='p-3 bg-[#171717] border border-[#262626] rounded-2xl hover:bg-[#262626] transition-all text-gray-500'
-                    >
-                        <MoreVertical className='size-5' />
-                    </button>
-                </div>
-            </div>
-
-            {/* Messages Area */}
-            <div className='flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 flex flex-col'>
-                 {messages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] group flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                            <div className={`
-                                p-4 rounded-2xl text-[14px] leading-relaxed shadow-sm relative
-                                ${msg.sender === 'user' 
-                                    ? 'bg-green-600 text-white rounded-tr-none' 
-                                    : 'bg-[#171717] border border-[#262626] text-gray-100 rounded-tl-none'}
-                            `}>
-                                <div className='markdown-container overflow-x-auto'>
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                        {msg.text}
-                                    </ReactMarkdown>
-                                </div>
-                                
-                                {msg.sender === 'bot' && (
-                                    <div className='absolute -right-20 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
-                                        <button 
-                                            onClick={() => copyToClipboard(msg.text, msg.id)}
-                                            className='p-2 hover:bg-[#1a1a1a] rounded-lg'
-                                            title="Copy to Clipboard"
-                                        >
-                                            {copiedId === msg.id ? (
-                                                <Check className='size-4 text-green-500' />
-                                            ) : (
-                                                <Copy className='size-4 text-gray-500' />
-                                            )}
-                                        </button>
-                                        <button 
-                                            onClick={() => handleBookmark(msg)}
-                                            className='p-2 hover:bg-[#1a1a1a] rounded-lg'
-                                            title="Save to Bookmarks"
-                                        >
-                                            <Bookmark className={`size-4 ${bookmarkedIds.has(msg.id) ? 'text-green-500 fill-green-500' : 'text-gray-500'}`} />
-                                        </button>
-                                    </div>
+            {/* Message Area */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px 80px', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 5 }}>
+                {filteredMessages.length === 0 && isSearching && (
+                    <div className="flex justify-center my-4 text-[#8696a0] text-sm">No messages found for "{searchQuery}"</div>
+                )}
+                {filteredMessages.map((msg, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                        <div style={{
+                            position: 'relative',
+                            padding: '10px 16px 20px 16px',
+                            borderRadius: '12px',
+                            maxWidth: '70%',
+                            minWidth: '100px',
+                            fontSize: '15px',
+                            backgroundColor: msg.sender === 'user' ? '#005c4b' : '#202c33',
+                            color: '#e9edef',
+                            wordBreak: 'break-word'
+                        }}>
+                            <p style={{ margin: 0, paddingRight: '20px', lineHeight: '1.5' }}>
+                                {isSearching && searchQuery ? (
+                                    <span>
+                                        {msg.text.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, index) => 
+                                            part.toLowerCase() === searchQuery.toLowerCase() 
+                                                ? <span key={index} className="bg-[#00a884] text-black font-bold">{part}</span> 
+                                                : part
+                                        )}
+                                    </span>
+                                ) : (
+                                    msg.text
                                 )}
-                            </div>
-                            <div className='flex items-center gap-2 mt-2 px-1'>
-                                <span className='text-[10px] text-gray-600 font-medium uppercase'>{msg.timestamp}</span>
+                            </p>
+                            <div style={{ position: 'absolute', bottom: '4px', right: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>{formatTime(msg.timestamp)}</span>
+                                {msg.sender === 'user' && <CheckCheck size={14} color="#53bdeb" />}
                             </div>
                         </div>
                     </div>
                 ))}
-
-                <div ref={messagesEndRef} />
-
-                {isTyping && (
-                    <div className='flex justify-start'>
-                        <div className='bg-[#171717] border border-[#262626] p-4 rounded-2xl rounded-tl-none flex gap-1.5'>
-                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-0' />
-                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-150' />
-                            <div className='w-1.5 h-1.5 bg-gray-600 rounded-full animate-bounce delay-300' />
+                {loading && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <div style={{ padding: '12px 16px', borderRadius: '12px', backgroundColor: '#202c33', display: 'flex', gap: '6px' }}>
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%' }} />
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.2s' }} />
+                            <div className="animate-bounce" style={{ width: '6px', height: '6px', backgroundColor: '#8696a0', borderRadius: '50%', animationDelay: '0.4s' }} />
                         </div>
                     </div>
                 )}
+                <div ref={scrollRef} />
             </div>
 
-            {/* Input Area */}
-            <div className='p-6 pt-0'>
-                <div className='bg-[#171717] border border-[#262626] rounded-2xl p-2 flex items-center gap-2 shadow-2xl focus-within:border-green-500/50 transition-all'>
-                    <button 
-                        onClick={() => document.getElementById('fileInput').click()}
-                        className='p-3 hover:bg-[#262626] rounded-xl transition-colors'
-                        title="Attach File"
-                    >
-                        <Paperclip className='size-5 text-gray-500' />
-                        <input 
-                            id="fileInput" 
-                            type="file" 
-                            className='hidden' 
-                            accept=".pdf,.txt"
-                            onChange={handleFileUpload}
-                        />
-                    </button>
+            {/* Footer */}
+            <footer style={{ padding: '10px 16px', backgroundColor: '#202c33', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 10, position: 'relative' }}>
+                
+                {showEmojiPicker && (
+                    <div style={{ position: 'absolute', bottom: '70px', left: '16px', zIndex: 50 }}>
+                        <EmojiPicker onEmojiClick={onEmojiClick} theme="dark" />
+                    </div>
+                )}
 
-                    <button 
-                        onClick={() => setInputText('/image ')}
-                        className='p-3 hover:bg-[#262626] rounded-xl transition-colors group'
-                        title="Generate AI Image"
-                    >
-                        <Image className='size-5 text-gray-500 group-hover:text-blue-500' />
-                    </button>
-                    <input 
-                        type="text" 
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                        placeholder="Type a message..."
-                        className='flex-1 bg-transparent border-none outline-none text-sm py-2 text-white placeholder-gray-600'
-                    />
-                    <button 
-                        onClick={handleSendMessage}
-                        className='p-3 bg-green-500 hover:bg-green-600 text-black rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95'
-                    >
-                        <Send className='size-5' />
-                    </button>
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    style={{ display: 'none' }} 
+                    onChange={handleFileUpload}
+                    accept=".pdf,.txt,.docx"
+                />
+                <div style={{ display: 'flex', gap: '16px', color: '#aebac1' }}>
+                    <Smile size={24} style={{ cursor: 'pointer' }} onClick={() => setShowEmojiPicker(!showEmojiPicker)} className={`transition-colors ${showEmojiPicker ? 'text-[#00a884]' : 'hover:text-white'}`} />
+                    <Paperclip size={24} style={{ cursor: 'pointer' }} onClick={() => fileInputRef.current.click()} className="hover:text-white transition-colors" />
                 </div>
-            </div>
+                <form onSubmit={handleSend} style={{ flex: 1 }}>
+                    <input 
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder={isRecording ? "Listening..." : "Type a message"}
+                        style={{ width: '100%', backgroundColor: '#2a3942', border: 'none', outline: 'none', padding: '12px 16px', borderRadius: '12px', color: '#d1d7db', fontSize: '15px' }}
+                    />
+                </form>
+                <div style={{ color: '#aebac1' }}>
+                    {input.trim() ? (
+                        <button onClick={handleSend} className="border-none bg-transparent transition-colors flex items-center justify-center text-[#00a884] hover:text-[#00c298] cursor-pointer">
+                            <Send size={24} />
+                        </button>
+                    ) : (
+                        <Mic size={24} style={{ cursor: 'pointer' }} onClick={handleMicClick} className={`transition-all ${isRecording ? 'text-red-500 animate-pulse scale-110' : 'hover:text-white'}`} />
+                    )}
+                </div>
+            </footer>
         </div>
     )
 }
 
 export default ChatContainer
-

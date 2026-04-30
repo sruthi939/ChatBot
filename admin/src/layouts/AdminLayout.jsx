@@ -4,21 +4,15 @@ import AdminHeader from '../components/AdminHeader'
 
 const AdminLayout = ({ children, user, onLogout }) => {
     return (
-        <div className="flex h-screen bg-[#0b0b0b] text-white overflow-hidden">
-            {/* Sidebar remains fixed */}
+        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b0b0b' }}>
+            {/* Fixed Sidebar */}
             <Sidebar onLogout={onLogout} />
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+            <div style={{ flex: 1, marginLeft: '260px', display: 'flex', flexDirection: 'column' }}>
                 <AdminHeader user={user} />
-                
-                <main className="flex-1 overflow-y-auto custom-scrollbar relative">
-                    {/* Background Decorative Element */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-500/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
-                    
-                    <div className="container mx-auto">
-                        {children}
-                    </div>
+                <main style={{ flex: 1, padding: '40px' }}>
+                    {children}
                 </main>
             </div>
         </div>

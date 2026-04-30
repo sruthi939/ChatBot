@@ -47,7 +47,7 @@ const Dashboard = ({ onNewChat, onSelectChat }) => {
                     <h2 className='text-lg font-bold'>Recent Chats</h2>
                     <button 
                         onClick={() => navigate('/history')}
-                        className='text-green-500 text-xs font-bold hover:underline flex items-center gap-1'
+                        className='text-green-500 text-xs font-bold hover:underline flex items-center gap-1 cursor-pointer'
                     >
                         View all <ChevronRight className='size-3' />
                     </button>
@@ -66,7 +66,7 @@ const Dashboard = ({ onNewChat, onSelectChat }) => {
                                 <h4 className='text-sm font-bold group-hover:text-green-500 transition-colors'>{user.lastMessage}</h4>
                                 <p className='text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-medium'>{user.timestamp} • {user.name}</p>
                             </div>
-                            <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors'>
+                            <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors cursor-pointer active:scale-95'>
                                 <MoreVertical className='size-4 text-gray-500' />
                             </button>
                         </div>

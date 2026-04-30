@@ -1,7 +1,6 @@
-@import "tailwindcss";
-
+/* Failsafe Global Styles */
 :root {
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: #0b0b0b;
   color: white;
 }
@@ -15,9 +14,22 @@
 body {
   min-height: 100vh;
   width: 100%;
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0b0b;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 10px;
 }

@@ -1,115 +1,104 @@
 import React, { useState } from 'react'
-import { Mail, Lock, Eye, Shield } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { login as loginApi } from '../lib/api'
-import { assets } from '../assets/assets'
+import { Link } from 'react-router-dom'
+import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react'
 
-const Login = ({ onLogin }) => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+const Login = ({ onLogin, error }) => {
+    const [showPass, setShowPass] = useState(false);
+    const [creds, setCreds] = useState({ email: '', password: '' });
 
-    const handleLoginClick = async () => {
-        if (!email || !password) return setError('Please fill in all fields');
-        
-        setIsLoading(true);
-        setError('');
-        
-        try {
-            const { data } = await loginApi({ email, password });
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            onLogin(data.user);
-            navigate('/');
-        } catch (err) {
-            setError(err.response?.data?.error || err.response?.data?.message || 'Login failed. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onLogin(creds);
+    };
+
+    const pageStyle = {
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0b141a',
+        fontFamily: 'sans-serif',
+        padding: '20px'
+    };
+
+    const cardStyle = {
+        width: '100%',
+        maxWidth: '420px',
+        backgroundColor: '#111b21',
+        borderRadius: '32px',
+        padding: '48px',
+        border: '1px solid rgba(255,255,255,0.05)',
+        textAlign: 'center',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+    };
+
+    const inputStyle = {
+        width: '100%',
+        backgroundColor: '#2a3942',
+        border: '1px solid transparent',
+        borderRadius: '16px',
+        padding: '16px 16px 16px 52px',
+        color: 'white',
+        fontSize: '15px',
+        outline: 'none',
+        transition: 'all 0.2s'
     };
 
     return (
-        <div className='min-h-screen bg-[#0b0b0b] flex flex-col items-center p-10'>
-            <div className='w-full max-w-sm flex flex-col items-center mt-12'>
-                <div className='w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center mb-10 shadow-2xl shadow-green-500/20 overflow-hidden'>
-                    <img src={assets.logo} alt="Logo" className='w-full h-full object-cover' />
+        <div style={pageStyle}>
+            <div style={cardStyle}>
+                <div style={{ display: 'inline-flex', padding: '16px', backgroundColor: 'rgba(0,168,132,0.1)', borderRadius: '24px', marginBottom: '32px' }}>
+                    <Shield size={40} color="#00a884" />
                 </div>
 
-                <h1 className='text-3xl font-bold mb-2'>Welcome Back!</h1>
-                <p className='text-gray-500 text-sm mb-12'>Sign in to continue</p>
+                <h1 style={{ color: '#e9edef', fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Welcome Back</h1>
+                <p style={{ color: '#8696a0', fontSize: '14px', marginBottom: '40px' }}>Sign in to continue your secure chat session</p>
 
-                {error && <div className='w-full p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-xs text-center'>{error}</div>}
+                {error && (
+                    <div style={{ padding: '12px', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, color: '#ef4444', fontSize: '13px', fontWeight: 'bold' }}>{error}</p>
+                    </div>
+                )}
 
-                <div className='w-full space-y-5'>
-                    <div className='relative group'>
-                        <Mail className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
+                <form onSubmit={handleSubmit}>
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
+                        <Mail style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
                             type="email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-5 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
+                            placeholder="Email address"
+                            required
+                            style={inputStyle}
+                            value={creds.email}
+                            onChange={(e) => setCreds({...creds, email: e.target.value})}
                         />
                     </div>
-                    <div className='relative group'>
-                        <Lock className='absolute left-5 top-1/2 -translate-y-1/2 size-5 text-gray-600 group-focus-within:text-green-500 transition-colors' />
+
+                    <div style={{ position: 'relative', marginBottom: '20px' }}>
+                        <Lock style={{ position: 'absolute', left: '18px', top: '18px', color: '#8696a0' }} size={20} />
                         <input 
-                            type="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            type={showPass ? "text" : "password"} 
                             placeholder="Password"
-                            className='w-full bg-[#171717] border border-[#262626] rounded-3xl py-5 pl-14 pr-14 outline-none focus:border-green-500/50 focus:ring-4 focus:ring-green-500/10 transition-all text-sm text-white'
+                            required
+                            style={inputStyle}
+                            value={creds.password}
+                            onChange={(e) => setCreds({...creds, password: e.target.value})}
                         />
-                        <button className='absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white'>
-                            <Eye className='size-5' />
-                        </button>
+                        <div onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '18px', top: '18px', color: '#8696a0', cursor: 'pointer' }}>
+                            {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </div>
                     </div>
-                </div>
 
-                <button className='w-full text-right mt-3 text-xs text-gray-600 font-medium hover:text-green-500 transition-colors'>
-                    Forgot password?
-                </button>
-
-                <button 
-                    onClick={handleLoginClick}
-                    disabled={isLoading}
-                    className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-5 rounded-3xl mt-10 transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50 disabled:scale-100'
-                >
-                    {isLoading ? 'Signing in...' : 'Login'}
-                </button>
-
-                <button 
-                    onClick={() => navigate('/signup')}
-                    className='w-full bg-transparent border border-[#262626] hover:bg-[#1a1a1a] text-white font-bold py-5 rounded-3xl mt-4 transition-all active:scale-95'
-                >
-                    Create New Account
-                </button>
-
-                <div className='w-full flex items-center gap-4 my-10'>
-                    <div className='flex-1 h-[1px] bg-[#262626]' />
-                    <span className='text-[10px] text-gray-600 uppercase font-bold tracking-widest'>or continue with</span>
-                    <div className='flex-1 h-[1px] bg-[#262626]' />
-                </div>
-
-                <div className='flex gap-5'>
-                    {/* Google */}
-                    <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:border-gray-600 transition-all active:scale-95'>
-                        <svg className='size-6 text-white' viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.288 1.288-3.312 2.712-7.112 2.712-6.048 0-10.744-4.896-10.744-10.944s4.696-10.944 10.744-10.944c3.272 0 5.672 1.288 7.448 2.968l2.312-2.312c-2.008-1.92-4.632-3.112-8.32-3.112-7.856 0-14.328 6.472-14.328 14.32s6.472 14.32 14.328 14.32c4.136 0 7.448-1.352 9.968-3.976 2.568-2.568 3.424-6.144 3.424-8.784 0-.848-.064-1.664-.192-2.448h-11.8z"/></svg>
+                    <button 
+                        type="submit"
+                        className="w-full p-4 bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] font-bold rounded-2xl transition-colors active:scale-95 text-base mt-3 cursor-pointer"
+                    >
+                        Sign In
                     </button>
-                    {/* Apple */}
-                    <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:border-gray-600 transition-all active:scale-95'>
-                        <svg className='size-6 text-white' viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05 1.72-3.11 1.72-1.01 0-1.36-.61-2.51-.61-1.15 0-1.55.61-2.51.61-1.06 0-2.13-.77-3.11-1.72-2.01-1.92-3.52-5.46-3.52-8.74 0-3.36 1.83-5.23 3.59-5.23 1.13 0 1.94.7 2.64.7.71 0 1.51-.7 2.64-.7 1.76 0 3.59 1.87 3.59 5.23 0 3.28-1.51 6.82-3.52 8.74zm-2.45-16.7c0 1.34-1.1 2.45-2.45 2.45-1.34 0-2.45-1.1-2.45-2.45 0-1.34 1.11-2.45 2.45-2.45 1.35 0 2.45 1.11 2.45 2.45z"/></svg>
-                    </button>
-                    {/* Github */}
-                    <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:border-gray-600 transition-all active:scale-95'>
-                        <svg className='size-6 text-white' viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    </button>
-                </div>
+                </form>
 
-                <p className='mt-12 text-sm text-gray-500'>
-                    Don't have an account? <button onClick={() => navigate('/signup')} className='text-green-500 font-bold hover:underline'>Sign Up</button>
+                <p style={{ marginTop: '40px', fontSize: '14px', color: '#8696a0' }}>
+                    Don't have an account? <Link to="/signup" style={{ color: '#00a884', textDecoration: 'none', fontWeight: 'bold' }}>Sign Up</Link>
                 </p>
             </div>
         </div>
@@ -117,4 +106,3 @@ const Login = ({ onLogin }) => {
 }
 
 export default Login
-

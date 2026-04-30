@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Terminal, RefreshCw, Eye } from 'lucide-react'
+import { Terminal, RefreshCw } from 'lucide-react'
 import { API } from '../App'
 
 const SystemLogs = () => {
@@ -25,39 +25,57 @@ const SystemLogs = () => {
         return () => clearInterval(interval);
     }, []);
 
+    const cardStyle = {
+        backgroundColor: '#171717',
+        border: '1px solid #262626',
+        borderRadius: '32px',
+        overflow: 'hidden',
+        marginTop: '32px'
+    };
+
     return (
-        <div className='p-10 space-y-10 animate-in slide-in-from-right-4 duration-500'>
-            <div className='flex justify-between items-center'>
+        <div style={{ animation: 'fadeIn 0.5s ease-in-out' }}>
+            <style>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 className='text-4xl font-bold'>System Logs</h1>
-                    <p className='text-gray-500 text-[10px] uppercase font-bold tracking-widest mt-1'>Monitor real-time engine activity</p>
+                    <h1 style={{ fontSize: '36px', fontWeight: 'bold', margin: 0 }}>System Logs</h1>
+                    <p style={{ color: '#6b7280', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', marginTop: '4px', letterSpacing: '1px' }}>Monitor real-time engine activity</p>
                 </div>
-                <button className='p-4 bg-[#171717] border border-[#262626] rounded-2xl hover:bg-[#1a1a1a] transition-all text-gray-400'>
+                <button 
+                    onClick={fetchLogs}
+                    style={{ padding: '16px', backgroundColor: '#171717', border: '1px solid #262626', borderRadius: '16px', color: '#6b7280', cursor: 'pointer' }}
+                >
                     <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
                 </button>
             </div>
 
-            <div className='bg-[#171717] border border-[#262626] rounded-[40px] overflow-hidden'>
-                <div className='p-8 border-b border-[#262626] flex items-center gap-3'>
-                    <Terminal className='text-green-500' size={20} />
-                    <h3 className='font-bold'>Console Output</h3>
+            <div style={cardStyle}>
+                <div style={{ padding: '24px 32px', borderBottom: '1px solid #262626', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Terminal color="#22c55e" size={20} />
+                    <h3 style={{ fontWeight: 'bold', margin: 0 }}>Console Output</h3>
                 </div>
                 
-                <div className='p-4 space-y-2 font-mono text-[13px]'>
+                <div style={{ padding: '16px', fontFamily: 'monospace', fontSize: '13px' }}>
                     {logs.map((log) => (
-                        <div key={log._id} className='flex gap-4 p-4 rounded-xl hover:bg-black/20 transition-all border border-transparent hover:border-[#262626] group'>
-                            <span className='text-gray-600 min-w-[140px]'>[{new Date(log.timestamp).toLocaleString()}]</span>
-                            <span className={`font-bold min-w-[80px] ${log.sender === 'bot' ? 'text-violet-500' : 'text-blue-500'}`}>
+                        <div key={log._id} style={{ display: 'flex', gap: '16px', padding: '12px 16px', borderRadius: '12px', transition: 'background 0.2s' }}>
+                            <span style={{ color: '#4b5563', minWidth: '160px' }}>[{new Date(log.timestamp).toLocaleString()}]</span>
+                            <span style={{ fontWeight: 'bold', minWidth: '80px', color: log.sender === 'bot' ? '#8b5cf6' : '#3b82f6' }}>
                                 {log.sender === 'bot' ? 'AI_RESP' : 'USER_MSG'}
                             </span>
-                            <span className='text-gray-500 min-w-[120px] font-bold'>{log.user?.name || 'Unknown'}</span>
-                            <span className='flex-1 text-gray-300 truncate group-hover:whitespace-normal transition-all'>
-                                {log.text.substring(0, 100)}{log.text.length > 100 ? '...' : ''}
+                            <span style={{ color: '#6b7280', minWidth: '120px', fontWeight: 'bold' }}>{log.user?.name || 'Unknown'}</span>
+                            <span style={{ flex: 1, color: '#d1d5db', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {log.text}
                             </span>
-                            <span className='text-green-500 font-bold opacity-50'>{log.tokens || 0} tks</span>
+                            <span style={{ color: '#22c55e', fontWeight: 'bold', opacity: 0.5 }}>{log.tokens || 0} tks</span>
                         </div>
                     ))}
-                    {logs.length === 0 && <p className='text-center py-10 text-gray-600'>No recent activity detected.</p>}
+                    {logs.length === 0 && <p style={{ textAlign: 'center', padding: '40px', color: '#4b5563' }}>No recent activity detected.</p>}
                 </div>
             </div>
         </div>

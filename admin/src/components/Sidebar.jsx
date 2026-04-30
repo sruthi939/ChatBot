@@ -12,24 +12,50 @@ const Sidebar = ({ onLogout }) => {
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
     ]
 
+    const sidebarStyle = {
+        width: '260px',
+        height: '100vh',
+        backgroundColor: '#171717',
+        borderRight: '1px solid #262626',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '24px',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 100
+    };
+
+    const linkStyle = (isActive) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '12px 16px',
+        borderRadius: '16px',
+        textDecoration: 'none',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'all 0.2s',
+        marginBottom: '8px',
+        color: isActive ? 'black' : '#6b7280',
+        backgroundColor: isActive ? '#22c55e' : 'transparent',
+    });
+
     return (
-        <div className='w-64 h-screen bg-[#171717] border-r border-[#262626] flex flex-col p-6'>
-            <div className='flex items-center gap-3 mb-12 px-2'>
-                <div className='p-2 bg-green-500 rounded-xl'>
-                    <Shield className='text-black' size={24} />
+        <div style={sidebarStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px', padding: '0 8px' }}>
+                <div style={{ padding: '8px', backgroundColor: '#22c55e', borderRadius: '12px' }}>
+                    <Shield size={24} color="black" />
                 </div>
-                <h1 className='text-xl font-bold'>Admin Console</h1>
+                <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Admin</h1>
             </div>
 
-            <nav className='flex-1 space-y-2'>
+            <nav style={{ flex: 1 }}>
                 {menuItems.map((item) => (
                     <NavLink
                         key={item.id}
                         to={`/${item.id}`}
-                        className={({ isActive }) => `
-                            flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-bold text-sm
-                            ${isActive ? 'bg-green-500 text-black shadow-lg shadow-green-500/20' : 'text-gray-500 hover:bg-[#1a1a1a] hover:text-white'}
-                        `}
+                        style={({ isActive }) => linkStyle(isActive)}
                     >
                         {item.icon}
                         {item.label}
@@ -39,7 +65,20 @@ const Sidebar = ({ onLogout }) => {
 
             <button 
                 onClick={onLogout}
-                className='flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all font-bold text-sm'
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    color: '#ef4444',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                }}
             >
                 <LogOut size={20} />
                 Logout
