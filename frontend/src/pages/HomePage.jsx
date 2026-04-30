@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import ChatContainer from '../components/ChatContainer'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getLatestNotification, getChatHistory, sendMessage as sendAPIMessage } from '../lib/api'
 import { Megaphone, X } from 'lucide-react'
 
 const HomePage = ({ onLogout }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const navigate = useNavigate();
     const [selectedUser, setSelectedUser] = useState(null)
     const [notification, setNotification] = useState(null)
     const [showBanner, setShowBanner] = useState(true)
     const [messages, setMessages] = useState([])
     const [loading, setLoading] = useState(false)
-    const [realHistory, setRealHistory] = useState([])
 
-    const location = useLocation()
-
-    // Load Real History on Start
+    // Load History
     useEffect(() => {
         const fetchInitialData = async () => {
             if (!user.id) return;
@@ -27,7 +25,6 @@ const HomePage = ({ onLogout }) => {
                 ]);
                 if (notifyRes.data) setNotification(notifyRes.data);
                 if (historyRes.data) {
-                    setRealHistory(historyRes.data);
                     setMessages(historyRes.data);
                     setSelectedUser({
                         id: 'ai',
@@ -45,33 +42,29 @@ const HomePage = ({ onLogout }) => {
     const handleSendMessage = async (text) => {
         if (!user.id) return;
 
-        // 1. Optimistic Update (Show user message immediately)
-        const optimisticUserMsg = { 
-            id: Date.now(), 
-            sender: 'user', 
-            text, 
-            timestamp: new Date().toISOString() 
-        };
+        const optimisticUserMsg = { id: Date.now(), sender: 'user', text, timestamp: new Date().toISOString() };
         setMessages(prev => [...prev, optimisticUserMsg]);
         setLoading(true);
 
         try {
-            // 2. Real Backend Call
             const { data } = await sendAPIMessage({ userId: user.id, text, persona: 'Architect' });
-            
-            // 3. Sync with Real Database Records (Replace optimistic with real IDs)
             setMessages(prev => {
                 const filtered = prev.filter(m => m.id !== optimisticUserMsg.id);
                 return [...filtered, data.userMsg, data.botMsg];
             });
-            setRealHistory(prev => [...prev, data.userMsg, data.botMsg]);
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.response?.data?.error || 'System Timeout';
-            alert(`AI_CONNECTION_ERROR: ${errorMsg}`);
-            // Rollback optimistic update if failed
+            const errorMsg = err.response?.data?.error || 'AI Connection Failed';
+            alert(`SYSTEM_ERROR: ${errorMsg}`);
             setMessages(prev => prev.filter(m => m.id !== optimisticUserMsg.id));
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleClearChat = () => {
+        if (window.confirm('Are you sure you want to clear your message history? This action is permanent.')) {
+            setMessages([]);
+            alert('History cleared in current view.');
         }
     };
 
@@ -90,6 +83,8 @@ const HomePage = ({ onLogout }) => {
                 selectedUser={selectedUser} 
                 setSelectedUser={setSelectedUser} 
                 lastMessage={messages[messages.length - 1]}
+                onNewChat={() => setSelectedUser({ id: 'ai', name: 'Neural Core AI', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Bot1' })}
+                onLogout={onLogout}
             />
             
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -108,7 +103,8 @@ const HomePage = ({ onLogout }) => {
                         selectedUser={{...selectedUser, messages}} 
                         onSendMessage={handleSendMessage} 
                         loading={loading}
-                        onBack={() => setSelectedUser(null)} 
+                        onBack={() => setSelectedUser(null)}
+                        onClearChat={handleClearChat}
                     />
                 ) : (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#8696a0', padding: '40px' }}>

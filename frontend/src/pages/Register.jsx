@@ -99,18 +99,7 @@ const Register = ({ onRegister, error }) => {
 
                     <button 
                         type="submit"
-                        style={{
-                            width: '100%',
-                            padding: '16px',
-                            backgroundColor: '#00a884',
-                            color: 'black',
-                            fontWeight: 'bold',
-                            borderRadius: '16px',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                            marginTop: '12px'
-                        }}
+                        className="w-full p-4 bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] font-bold rounded-2xl transition-colors active:scale-95 text-base mt-3 cursor-pointer"
                     >
                         Create Account
                     </button>

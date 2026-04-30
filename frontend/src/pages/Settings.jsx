@@ -144,7 +144,7 @@ const Settings = ({ onLogout }) => {
                                 </div>
                                 <h2 className='text-xl font-bold'>Change Password</h2>
                             </div>
-                            <button onClick={() => setShowPasswordModal(false)} className='p-2 hover:bg-[#262626] rounded-xl transition-colors'>
+                            <button onClick={() => setShowPasswordModal(false)} className='p-2 hover:bg-[#262626] rounded-xl transition-colors cursor-pointer active:scale-95'>
                                 <X className='size-5 text-gray-500' />
                             </button>
                         </div>
@@ -175,7 +175,7 @@ const Settings = ({ onLogout }) => {
                             <button 
                                 type="submit" 
                                 disabled={loading}
-                                className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50'
+                                className='w-full bg-green-500 hover:bg-green-600 text-black font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed'
                             >
                                 {loading ? 'Updating...' : 'Update Password'}
                             </button>

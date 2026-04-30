@@ -1,12 +1,12 @@
-import React from 'react'
-import { Search, MoreVertical, MessageSquarePlus, CheckCheck } from 'lucide-react'
+import React, { useState } from 'react'
+import { Search, MoreVertical, MessageSquarePlus, CheckCheck, LogOut, User as UserIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-const Sidebar = ({ selectedUser, setSelectedUser, lastMessage }) => {
+const Sidebar = ({ selectedUser, setSelectedUser, lastMessage, onNewChat, onLogout }) => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-    // Real-time dynamic chat list based on database activity
     const chats = [
         { 
             id: 'ai', 
@@ -32,15 +32,25 @@ const Sidebar = ({ selectedUser, setSelectedUser, lastMessage }) => {
         <div style={sidebarStyle}>
             {/* Header */}
             <div style={{ height: '60px', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#202c33' }}>
-                <div onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+                <div onClick={() => setShowProfileMenu(!showProfileMenu)} style={{ cursor: 'pointer', position: 'relative' }}>
                     <img 
                         src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'User'}`} 
                         style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#111b21' }} 
                         alt="Profile" 
                     />
+                    {showProfileMenu && (
+                        <div style={{ position: 'absolute', top: '50px', left: 0, width: '180px', backgroundColor: '#233138', borderRadius: '8px', padding: '8px 0', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', zIndex: 60 }}>
+                            <div onClick={() => navigate('/profile')} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', color: '#e9edef', fontSize: '14px' }}>
+                                <UserIcon size={16} /> My Profile
+                            </div>
+                            <div onClick={onLogout} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', color: '#ef4444', fontSize: '14px' }}>
+                                <LogOut size={16} /> Logout
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div style={{ display: 'flex', gap: '24px', color: '#aebac1' }}>
-                    <MessageSquarePlus size={20} style={{ cursor: 'pointer' }} />
+                    <MessageSquarePlus size={20} style={{ cursor: 'pointer' }} onClick={onNewChat} />
                     <MoreVertical size={20} style={{ cursor: 'pointer' }} />
                 </div>
             </div>
