@@ -45,7 +45,7 @@ const Profile = ({ onLogout }) => {
                 <div className='flex justify-center relative z-10'>
                     <button 
                         onClick={onLogout}
-                        className='flex items-center gap-3 px-10 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl font-bold transition-all border border-red-500/20 active:scale-95'
+                        className='flex items-center gap-3 px-10 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl font-bold transition-all border border-red-500/20 active:scale-95 cursor-pointer'
                     >
                         <LogOut className='size-5' />
                         Log Out
