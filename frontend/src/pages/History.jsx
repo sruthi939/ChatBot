@@ -79,7 +79,7 @@ const History = () => {
                                     <h4 className='text-sm font-bold'>{chat.lastMessage}</h4>
                                     <p className='text-[10px] text-gray-500 mt-1'>{chat.timestamp} • {chat.name}</p>
                                 </div>
-                                <button className='p-2 hover:bg-[#262626] rounded-xl'>
+                                <button className='p-2 hover:bg-[#262626] rounded-xl transition-colors cursor-pointer active:scale-95'>
                                     <MoreVertical className='size-5 text-gray-500' />
                                 </button>
                             </div>
